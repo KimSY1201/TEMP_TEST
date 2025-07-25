@@ -184,6 +184,7 @@ class OutputModule(QWidget):
         self.interpolated_grid_size = self.DEFAULT_INTERPOLATED_GRID_SIZE
         # cell_size는 interpolated_grid_size에 따라 동적으로 계산되도록
         self.cell_size = self.max_height // self.interpolated_grid_size
+        self.font_size = self.cell_size//3
 
         self.anomaly_count = 0
         self.log_filename = "detected_values.txt"
@@ -304,7 +305,8 @@ class OutputModule(QWidget):
                 cell.setFixedSize(self.cell_size, self.cell_size)
                 cell.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 cell.setProperty("class", "HeatmapCell")
-                cell.setStyleSheet(f"background-color: lightgray; font-size: {self.cell_size-3}px")
+                cell.setStyleSheet(f"background-color: lightgray; font-size: {self.font_size}px")
+                print(f"font-size: {self.font_size}px")
                 self.heatmap_layout.addWidget(cell, i, j)
                 row_cells.append(cell)
             self.grid_cells.append(row_cells)
@@ -447,7 +449,7 @@ class OutputModule(QWidget):
                     text_color = "black" #if brightness > 186 else "white"
                     cell = self.grid_cells[i][j]
                     cell.setText(f"{value:.1f}")
-                    cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: {self.cell_size-3}px; border: none;")
+                    cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: {self.font_size}px; border: none;")
                     
                 else:
                     print(f"Debug: Attempted to access out-of-bounds cell [{i}][{j}] for interpolated grid of size {interpolated_grid.shape}. Grid cells size: {len(self.grid_cells)}x{len(self.grid_cells[0] if self.grid_cells else 0)}")
