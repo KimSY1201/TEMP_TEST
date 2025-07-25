@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton,
-                             QSlider, QSpinBox)
+                             QSlider, QSpinBox, QDoubleSpinBox)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
 
@@ -74,6 +74,25 @@ QPushButton:hover {
 }
 QPushButton:pressed {
     background-color: #4A4A4A; /* 눌렀을 때 */
+}
+
+/* 온도 조절 버튼 작은 스타일 */
+QPushButton[class="AdjustButton"] {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 4px 8px;
+    min-width: 30px;
+}
+
+/* QDoubleSpinBox 스타일 */
+QDoubleSpinBox {
+    background-color: #2E2E2E;
+    color: #FFFFFF;
+    border: 1px solid #666666;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 /* 상태 표시기(LED) 스타일 */
@@ -198,6 +217,10 @@ class OutputModule(QWidget):
 
         self.gaussian_sigma = 0.6 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
 
+        # === 히트맵 온도 범위 인스턴스 변수 ===
+        self.min_temp = 19.0
+        self.max_temp = 32.0
+        
         self.init_ui()
 
     def init_ui(self):
@@ -224,6 +247,27 @@ class OutputModule(QWidget):
 
         self.humidity_label = QLabel("습도: 55.0%")
         self.humidity_label.setProperty("class", "InfoLabel")
+        
+        # --- 히트맵 온도 범위 조절 위젯 ---
+        temp_range_group_box = QWidget()
+        temp_range_group_box.setObjectName("TopPanel")
+        temp_range_layout = QVBoxLayout(temp_range_group_box)
+        
+        temp_range_title = QLabel("히트맵 온도 범위")
+        temp_range_title.setProperty("class", "TitleLabel")
+        
+        # 최저 온도 조절 UI
+        min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
+        # 최고 온도 조절 UI
+        max_temp_layout, self.max_temp_spinbox = self._create_temp_control_row("최고", self.max_temp)
+
+        # Signal 연결
+        self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
+        self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
+
+        temp_range_layout.addWidget(temp_range_title)
+        temp_range_layout.addLayout(min_temp_layout)
+        temp_range_layout.addLayout(max_temp_layout)
 
         # --- 그리드 크기 조절 위젯 ---
         grid_size_group_box = QWidget()
@@ -235,6 +279,7 @@ class OutputModule(QWidget):
         self.grid_label_prefix.setProperty("class", "TitleLabel")
 
         self.grid_size_spinbox = QSpinBox()
+        
         # 원본 그리드 크기의 배수로 설정
         self.grid_size_spinbox.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8) # 예시: 8x8 ~ 64x64
         self.grid_size_spinbox.setSingleStep(self.ORIGINAL_GRID_SIZE) # 8단위로 변경
@@ -268,6 +313,7 @@ class OutputModule(QWidget):
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
         left_panel_layout.addWidget(self.humidity_label)
+        left_panel_layout.addWidget(temp_range_group_box) # 온도 조절 위젯 추가
 
         left_panel_layout.addWidget(grid_size_group_box) # QWidget 자체를 추가
         left_panel_layout.addStretch(1)
@@ -285,6 +331,56 @@ class OutputModule(QWidget):
 
         main_layout.setColumnStretch(1, 1)
         main_layout.setRowStretch(0, 1)
+        
+     # === 온도 조절 UI 생성 헬퍼 함수 ===
+    def _create_temp_control_row(self, label_text, initial_value):
+        layout = QHBoxLayout()
+        label = QLabel(label_text)
+        label.setProperty("class", "InfoLabel")
+
+        dec_button = QPushButton("-")
+        dec_button.setProperty("class", "AdjustButton")
+
+        spin_box = QDoubleSpinBox()
+        spin_box.setRange(-50.0, 100.0) # 범위 설정
+        spin_box.setSingleStep(0.1)
+        spin_box.setDecimals(1) # 소수점 한 자리
+        spin_box.setValue(initial_value)
+
+        inc_button = QPushButton("+")
+        inc_button.setProperty("class", "AdjustButton")
+
+        # 버튼 클릭 시그널 연결
+        dec_button.clicked.connect(lambda: self._adjust_temp(spin_box, -0.1))
+        inc_button.clicked.connect(lambda: self._adjust_temp(spin_box, 0.1))
+
+        layout.addWidget(label)
+        layout.addStretch(1)
+        layout.addWidget(dec_button)
+        layout.addWidget(spin_box)
+        layout.addWidget(inc_button)
+
+        return layout, spin_box
+    
+    # === [추가됨] +/- 버튼으로 온도 조절하는 슬롯 ===
+    def _adjust_temp(self, spin_box, amount):
+        current_value = spin_box.value()
+        spin_box.setValue(current_value + amount)
+
+    # === [추가됨] 스핀박스 값 변경 시 실제 변수 업데이트 및 히트맵 갱신 ===
+    def _update_temp_range(self, temp_type, value):
+        if temp_type == 'min':
+            self.min_temp = value
+        elif temp_type == 'max':
+            self.max_temp = value
+
+        # 현재 데이터가 있으면 히트맵을 다시 그림
+        self._redraw_heatmap()
+        
+    # === [추가됨] 현재 데이터로 히트맵을 다시 그리는 함수 ===
+    def _redraw_heatmap(self):
+        if self.current_data_package:
+            self.update_heatmap(self.current_data_package.get('values', []))
 
     def _create_heatmap_cells(self):
         # 기존 셀들을 모두 제거
