@@ -195,7 +195,7 @@ class OutputModule(QWidget):
         self.heatmap_layout = None # 히트맵 레이아웃을 저장할 변수 추가
         self.current_data_package = None # 마지막으로 받은 데이터 패키지를 저장
 
-        self.gaussian_sigma = 1.0 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
+        self.gaussian_sigma = 0.8 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
 
         self.init_ui()
 
@@ -418,6 +418,7 @@ class OutputModule(QWidget):
             for j_orig in range(self.ORIGINAL_GRID_SIZE):
                 # 필터링된 데이터에서 값을 가져옵니다.
                 value = filtered_data[i_orig, j_orig]
+                # value = original_data[i_orig, j_orig]
                 # 원본 셀 값을 확대된 그리드의 해당 블록에 할당
                 for i_interp in range(i_orig * scale_factor, (i_orig + 1) * scale_factor):
                     for j_interp in range(j_orig * scale_factor, (j_orig + 1) * scale_factor):
@@ -446,7 +447,8 @@ class OutputModule(QWidget):
                     text_color = "black" #if brightness > 186 else "white"
                     cell = self.grid_cells[i][j]
                     cell.setText(f"{value:.1f}")
-                    cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: 14px; border: none;")
+                    cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: {self.cell_size-3}px; border: none;")
+                    
                 else:
                     print(f"Debug: Attempted to access out-of-bounds cell [{i}][{j}] for interpolated grid of size {interpolated_grid.shape}. Grid cells size: {len(self.grid_cells)}x{len(self.grid_cells[0] if self.grid_cells else 0)}")
 
