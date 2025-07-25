@@ -196,7 +196,7 @@ class OutputModule(QWidget):
         self.heatmap_layout = None # 히트맵 레이아웃을 저장할 변수 추가
         self.current_data_package = None # 마지막으로 받은 데이터 패키지를 저장
 
-        self.gaussian_sigma = 0.8 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
+        self.gaussian_sigma = 0.6 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
 
         self.init_ui()
 
@@ -306,7 +306,7 @@ class OutputModule(QWidget):
                 cell.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 cell.setProperty("class", "HeatmapCell")
                 cell.setStyleSheet(f"background-color: lightgray; font-size: {self.font_size}px")
-                print(f"font-size: {self.font_size}px")
+                # print(f"font-size: {self.font_size}px")
                 self.heatmap_layout.addWidget(cell, i, j)
                 row_cells.append(cell)
             self.grid_cells.append(row_cells)
@@ -409,7 +409,7 @@ class OutputModule(QWidget):
         # sigma 값은 필터의 강도를 조절합니다. 값이 클수록 더 많이 흐려집니다.
         filtered_data = gaussian_filter(original_data, sigma=self.gaussian_sigma)
 
-        # 보간된 그리드 생성
+       # 보간된 그리드 생성
         if self.interpolated_grid_size % self.ORIGINAL_GRID_SIZE != 0:
             print(f"Warning: interpolated_grid_size ({self.interpolated_grid_size}) is not a multiple of ORIGINAL_GRID_SIZE ({self.ORIGINAL_GRID_SIZE}). Interpolation may be imprecise.")
 
