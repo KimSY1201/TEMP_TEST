@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton,
-                             QSlider, QSpinBox, QDoubleSpinBox)
+                             QSlider, QSpinBox, QDoubleSpinBox, QCheckBox)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
 
@@ -215,11 +215,14 @@ class OutputModule(QWidget):
         self.heatmap_layout = None # 히트맵 레이아웃을 저장할 변수 추가
         self.current_data_package = None # 마지막으로 받은 데이터 패키지를 저장
 
-        self.gaussian_sigma = 0.6 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
+        self.gaussian_sigma = 0.8 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
 
         # === 히트맵 온도 범위 인스턴스 변수 ===
         self.min_temp = 19.0
         self.max_temp = 32.0
+        
+        # == 온도 출력 on off == 
+        self.display_degree = False
         
         self.init_ui()
 
@@ -248,6 +251,11 @@ class OutputModule(QWidget):
         self.humidity_label = QLabel("습도: 55.0%")
         self.humidity_label.setProperty("class", "InfoLabel")
         
+        # -- 온도 표시 위젯 --
+        display_degree = QCheckBox("온도 표시", self)
+        # display_degree.toggle()
+        display_degree.stateChanged.connect(self.display_degree_control)
+                
         # --- 히트맵 온도 범위 조절 위젯 ---
         temp_range_group_box = QWidget()
         temp_range_group_box.setObjectName("TopPanel")
@@ -279,12 +287,13 @@ class OutputModule(QWidget):
         self.grid_label_prefix.setProperty("class", "TitleLabel")
 
         self.grid_size_spinbox = QSpinBox()
-        
         # 원본 그리드 크기의 배수로 설정
         self.grid_size_spinbox.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8) # 예시: 8x8 ~ 64x64
         self.grid_size_spinbox.setSingleStep(self.ORIGINAL_GRID_SIZE) # 8단위로 변경
         self.grid_size_spinbox.setValue(self.interpolated_grid_size)
         self.grid_size_spinbox.valueChanged.connect(self._update_grid_size_from_spinbox)
+        self.grid_size_spinbox.setStyleSheet(f"background-color:black")
+        
         self.grid_size_spinbox.setFont(QFont("Arial", 14))
 
         self.grid_size_slider = QSlider(Qt.Orientation.Horizontal)
@@ -298,7 +307,7 @@ class OutputModule(QWidget):
         grid_size_up_layout.addWidget(self.grid_size_spinbox)
 
         grid_size_layout.addLayout(grid_size_up_layout)
-        grid_size_layout.addWidget(self.grid_size_slider)
+        # grid_size_layout.addWidget(self.grid_size_slider)
         # --- 그리드 크기 조절 위젯 끝 ---
 
         self.log_button = QPushButton("이상 감지 정보 자세히 보기")
@@ -313,6 +322,7 @@ class OutputModule(QWidget):
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
         left_panel_layout.addWidget(self.humidity_label)
+        left_panel_layout.addWidget(display_degree) # 온도 조절 위젯 추가
         left_panel_layout.addWidget(temp_range_group_box) # 온도 조절 위젯 추가
 
         left_panel_layout.addWidget(grid_size_group_box) # QWidget 자체를 추가
@@ -331,6 +341,10 @@ class OutputModule(QWidget):
 
         main_layout.setColumnStretch(1, 1)
         main_layout.setRowStretch(0, 1)
+    
+    def display_degree_control(self, state):
+        self.display_degree = state
+    
         
      # === 온도 조절 UI 생성 헬퍼 함수 ===
     def _create_temp_control_row(self, label_text, initial_value):
@@ -412,7 +426,7 @@ class OutputModule(QWidget):
         self.grid_size_slider.setValue(value)
         # 실제 그리드 크기 업데이트 로직 호출
         self._set_grid_size(value)
-        self.showMaximized() # 현재 윈도우를 최대화합니다.
+        
         
     def _update_grid_size_from_slider(self, value):
         # 슬라이더 값이 변경되면 스핀박스 값도 변경
@@ -429,6 +443,7 @@ class OutputModule(QWidget):
             # 그리드 크기 변경 후, 현재 가지고 있는 데이터로 히트맵을 다시 업데이트
             if self.current_data_package:
                 self.update_heatmap(self.current_data_package.get('values', []))
+                
 
     def _create_status_row(self, text):
         layout = QHBoxLayout()
@@ -501,10 +516,6 @@ class OutputModule(QWidget):
 
         original_data = np.array(values).reshape((self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE))
 
-        # === [변경됨] 가우시안 필터 적용 ===
-        # sigma 값은 필터의 강도를 조절합니다. 값이 클수록 더 많이 흐려집니다.
-        filtered_data = gaussian_filter(original_data, sigma=self.gaussian_sigma)
-
        # 보간된 그리드 생성
         if self.interpolated_grid_size % self.ORIGINAL_GRID_SIZE != 0:
             print(f"Warning: interpolated_grid_size ({self.interpolated_grid_size}) is not a multiple of ORIGINAL_GRID_SIZE ({self.ORIGINAL_GRID_SIZE}). Interpolation may be imprecise.")
@@ -515,7 +526,8 @@ class OutputModule(QWidget):
         for i_orig in range(self.ORIGINAL_GRID_SIZE):
             for j_orig in range(self.ORIGINAL_GRID_SIZE):
                 # 필터링된 데이터에서 값을 가져옵니다.
-                value = filtered_data[i_orig, j_orig]
+                value = original_data[i_orig, j_orig]
+                # value = filtered_data[i_orig, j_orig]
                 # value = original_data[i_orig, j_orig]
                 # 원본 셀 값을 확대된 그리드의 해당 블록에 할당
                 for i_interp in range(i_orig * scale_factor, (i_orig + 1) * scale_factor):
@@ -524,6 +536,13 @@ class OutputModule(QWidget):
                         if i_interp < self.interpolated_grid_size and j_interp < self.interpolated_grid_size:
                             interpolated_grid[i_interp, j_interp] = value
 
+        
+        # === [변경됨] 가우시안 필터 적용 ===
+        # sigma 값은 필터의 강도를 조절합니다. 값이 클수록 더 많이 흐려집니다.
+        
+        interpolated_grid = gaussian_filter(interpolated_grid, sigma=self.gaussian_sigma)
+        
+        
         # 셀 업데이트
         if interpolated_grid.shape[0] != len(self.grid_cells) or \
            (len(self.grid_cells) > 0 and interpolated_grid.shape[1] != len(self.grid_cells[0])):
@@ -544,11 +563,15 @@ class OutputModule(QWidget):
                     brightness = color.red() * 0.299 + color.green() * 0.587 + color.blue() * 0.114
                     text_color = "black" #if brightness > 186 else "white"
                     cell = self.grid_cells[i][j]
-                    cell.setText(f"{value:.1f}")
-                    cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: {self.font_size}px; border: none;")
                     
+                    if self.display_degree:
+                        cell.setText(f"{value:.1f}")
+                    else:
+                        cell.setText(f"")
+                    cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: {self.font_size}px; border: none;")
                 else:
                     print(f"Debug: Attempted to access out-of-bounds cell [{i}][{j}] for interpolated grid of size {interpolated_grid.shape}. Grid cells size: {len(self.grid_cells)}x{len(self.grid_cells[0] if self.grid_cells else 0)}")
+        self.showMaximized() # 현재 윈도우를 최대화합니다.
 
 
     def show_alert_popup(self, title, message):
@@ -575,8 +598,8 @@ class OutputModule(QWidget):
             subprocess.run(["xdg-open", self.log_filename])
 
     def get_color_from_value(self, value):
-        min_temp = 19.0
-        max_temp = 32.0
+        min_temp = self.min_temp
+        max_temp = self.max_temp
 
         temp = float(value)
 

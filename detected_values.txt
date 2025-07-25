@@ -5496,3 +5496,38 @@ Overall Average: 25.34°C
 Overall Average: 25.16°C
 - Index 60: 34.75 (감지 기준 30.0°C 초과)
 
+--- Detected at 2025-07-25 15:34:59 ---
+누적 이상 감지 횟수: 1회
+Overall Average: 25.91°C
+- Index 58: 30.25 (감지 기준 30.0°C 초과)
+
+--- Detected at 2025-07-25 15:35:02 ---
+누적 이상 감지 횟수: 2회
+Overall Average: 25.97°C
+- Index 50: 30.25 (감지 기준 30.0°C 초과)
+
+--- Detected at 2025-07-25 15:35:03 ---
+누적 이상 감지 횟수: 3회
+Overall Average: 26.02°C
+- Index 50: 30.25 (감지 기준 30.0°C 초과)
+
+--- Detected at 2025-07-25 15:35:03 ---
+누적 이상 감지 횟수: 4회
+Overall Average: 25.98°C
+- Index 50: 30.25 (감지 기준 30.0°C 초과)
+
+--- Detected at 2025-07-25 15:35:03 ---
+누적 이상 감지 횟수: 5회
+Overall Average: 25.87°C
+- Index 50: 30.25 (감지 기준 30.0°C 초과)
+
+--- Detected at 2025-07-25 15:35:04 ---
+누적 이상 감지 횟수: 6회
+Overall Average: 25.94°C
+- Index 50: 30.25 (감지 기준 30.0°C 초과)
+
+--- Detected at 2025-07-25 15:35:06 ---
+누적 이상 감지 횟수: 7회
+Overall Average: 25.93°C
+- Index 50: 30.25 (감지 기준 30.0°C 초과)
+
