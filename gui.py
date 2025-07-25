@@ -50,25 +50,7 @@ class OutputModule(QWidget):
         main_layout.addLayout(grid_layout)
         self.setLayout(main_layout)
 
-    def get_color_from_value(self, value):
-        # 0-100 값을 기준으로 색상을 반환 (예: 0=파랑, 100=빨강)
-        # 이 부분은 필요에 따라 커스터마이징하세요.
-        normalized_value = max(0, min(100, value)) # 0~100 사이로 정규화
-        
-        # 간단한 그라데이션 (파랑 -> 초록 -> 빨강)
-        if normalized_value < 50:
-            # 파랑에서 초록으로
-            r = int(255 * (normalized_value / 50))
-            g = 255
-            b = int(255 * (1 - normalized_value / 50))
-        else:
-            # 초록에서 빨강으로
-            r = 255
-            g = int(255 * (1 - (normalized_value - 50) / 50))
-            b = 0
-            
-        return QColor(r, g, b)
-
+    
     def update_display(self, data_package):
         # update_display 호출 시점 확인을 위한 print 추가
         print(f"OutputModule: update_display called for time {data_package['time']}")

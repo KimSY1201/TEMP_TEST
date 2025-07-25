@@ -105,8 +105,11 @@ class OutputModule(QWidget):
     ORIGINAL_GRID_SIZE = 8
     INTERPOLATED_GRID_SIZE = 15
 
-    def __init__(self, data_signal_obj):
+    def __init__(self, data_signal_obj, available_rect):
         super().__init__()
+        self.max_width = available_rect.width()
+        self.max_height = available_rect.height()
+        
         self.anomaly_count = 0
         self.log_filename = "detected_values.txt" 
         self.fire_alert_triggered = False
@@ -126,22 +129,16 @@ class OutputModule(QWidget):
         main_layout = QGridLayout(self)
         main_layout.setSpacing(15)
 
-        top_panel = QWidget()
-        top_panel.setObjectName("TopPanel")
-        top_info_layout = QHBoxLayout(top_panel)
-        self.avg_temp_label = QLabel("평균 온도: N/A")
-        self.avg_temp_label.setProperty("class", "TitleLabel")
-        self.anomaly_count_label = QLabel(f"이상 감지: {self.anomaly_count} 회")
-        self.anomaly_count_label.setObjectName("AnomalyCountLabel")
-        top_info_layout.addWidget(self.avg_temp_label)
-        top_info_layout.addStretch(1)
-        top_info_layout.addWidget(self.anomaly_count_label)
-        top_info_layout.setContentsMargins(0,0,0,0)
-
+        
         left_panel = QWidget()
         left_panel.setObjectName("LeftPanel")
         left_panel_layout = QVBoxLayout(left_panel)
         left_panel_layout.setSpacing(20)
+        
+        self.avg_temp_label = QLabel("평균 온도: N/A")
+        self.avg_temp_label.setProperty("class", "TitleLabel")
+        self.anomaly_count_label = QLabel(f"이상 감지: {self.anomaly_count} 회")
+        self.anomaly_count_label.setObjectName("AnomalyCountLabel")
         
         fire_layout, self.fire_indicator = self._create_status_row("화재 감지")
         smoke_layout, self.smoke_indicator = self._create_status_row("연기 감지")
@@ -151,7 +148,9 @@ class OutputModule(QWidget):
         
         self.log_button = QPushButton("이상 감지 정보 자세히 보기")
         self.log_button.clicked.connect(self.open_log_file)
-
+        
+        left_panel_layout.addWidget(self.avg_temp_label)
+        left_panel_layout.addWidget(self.anomaly_count_label)
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
         left_panel_layout.addWidget(self.humidity_label)
@@ -176,7 +175,7 @@ class OutputModule(QWidget):
         self.time_label = QLabel("시간: N/A")
         self.time_label.setFont(QFont("Arial", 9))
         
-        main_layout.addWidget(top_panel, 0, 0, 1, 2)
+        # main_layout.addWidget(top_panel, 0, 0, 1, 2)
         main_layout.addWidget(left_panel, 1, 0)
         main_layout.addLayout(grid_layout, 1, 1)
         main_layout.addWidget(self.time_label, 2, 1, Qt.AlignmentFlag.AlignRight)
@@ -257,7 +256,7 @@ class OutputModule(QWidget):
         for i in range(self.INTERPOLATED_GRID_SIZE):
             for j in range(self.INTERPOLATED_GRID_SIZE):
                 value = interpolated_grid[i, j]
-                color = self.get_color_jet(value)
+                color = self.get_color_from_value(value)
                 brightness = color.red() * 0.299 + color.green() * 0.587 + color.blue() * 0.114
                 text_color = "black" if brightness > 186 else "white"
                 cell = self.grid_cells[i][j]

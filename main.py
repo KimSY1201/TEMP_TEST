@@ -35,7 +35,9 @@ def on_app_exit(receiver: ReceiverModule, detection_module: DetectionModule):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    
+    primary_screen = app.primaryScreen()
+    available_rect = primary_screen.availableGeometry()
+        
     # GUI에 전역 스타일시트를 적용합니다.
     app.setStyleSheet(GLOBAL_STYLESHEET)
 
@@ -48,11 +50,12 @@ if __name__ == '__main__':
 
     # 1. 리시버 모듈 인스턴스 생성 및 시작
     # COM 포트와 보드레이트는 실제 환경에 맞게 조절하세요.
-    receiver = ReceiverModule(output_queue, detection_queue, port='COM4', baudrate=38400)
+    # receiver = ReceiverModule(output_queue, detection_queue, port='COM4', baudrate=38400)
+    receiver = ReceiverModule(output_queue, detection_queue, port='COM3', baudrate=57600)
     receiver.start()
 
     # 2. 출력 모듈 (GUI) 인스턴스 생성 및 표시
-    output_module_gui = OutputModule(data_signal_obj)
+    output_module_gui = OutputModule(data_signal_obj,available_rect)
     output_module_gui.show()
 
     # 3. 감지 모듈 인스턴스 생성 및 시작
