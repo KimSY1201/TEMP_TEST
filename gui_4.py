@@ -7,8 +7,10 @@ from datetime import datetime
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton,
                              QSlider, QSpinBox, QDoubleSpinBox, QCheckBox)
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
+import queue
+import time
 
 # === [수정됨] 1920x1080 해상도에 맞춰 폰트 크기 상향 조정 ===
 GLOBAL_STYLESHEET = """
@@ -123,6 +125,8 @@ from scipy.ndimage import gaussian_filter
 
 class DataSignal(QObject):
     update_data_signal = pyqtSignal(dict)
+    # [추가] DetectionModule에서 GUI로 이상 감지 횟수를 전달하기 위한 시그널
+    anomaly_detected_signal = pyqtSignal(int)
 
 class DraggableNumberLabel(QLabel):
     """
@@ -189,7 +193,64 @@ class DraggableNumberLabel(QLabel):
             self.unsetCursor()
         super().mouseReleaseEvent(event)
 
+# [추가] 누락되었던 DetectionModule 클래스 정의
+# ===================================================================
+class DetectionModule(QThread):
+    def __init__(self, detection_queue, data_signal, base_temperature=25.0, threshold=5.0, filename="detected_values.txt"):
+        super().__init__()
+        self.detection_queue = detection_queue
+        self.data_signal = data_signal
+        self.base_temperature = base_temperature
+        self.threshold = threshold
+        self.filename = filename
+        self.running = True
+        self.anomaly_total_count = 0
 
+    def run(self):
+        while self.running:
+            try:
+                data_package = self.detection_queue.get(timeout=0.1)
+
+                if 'values' in data_package and 'time' in data_package:
+                    current_time = data_package['time']
+                    values = data_package['values']
+
+                    if len(values) == 64:
+                        self.process_values(current_time, values)
+                    else:
+                        print(f"DetectionModule: Expected 64 values, got {len(values)}. Skipping processing.")
+                else:
+                    print(f"DetectionModule: Received invalid data_package. Keys 'values' or 'time' missing.")
+            except queue.Empty:
+                continue
+
+    def process_values(self, current_time, values):
+        values_array = np.array(values)
+        average = np.mean(values_array)
+        detection_limit = self.base_temperature + self.threshold
+        
+        detected_high_values = [f"Index {i}: {val:.2f}" for i, val in enumerate(values_array) if val > detection_limit]
+        
+        if detected_high_values:
+            self.anomaly_total_count += 1
+            self.data_signal.anomaly_detected_signal.emit(self.anomaly_total_count)
+
+            with open(self.filename, 'a', encoding='utf-8') as f:
+                f.write(f"--- Detected at {current_time} ---\n")
+                f.write(f"누적 이상 감지 횟수: {self.anomaly_total_count}회\n")
+                f.write(f"Overall Average: {average:.2f}°C\n")
+                for item in detected_high_values:
+                    f.write(f"- {item}\n")
+                f.write("\n")
+                
+            print(f"Detected high values at {current_time}. Total detections: {self.anomaly_total_count}. Saved to {self.filename}")
+        else:
+            pass
+
+    def stop(self):
+        self.running = False
+        self.wait()
+        
 class OutputModule(QWidget):
     ORIGINAL_GRID_SIZE = 8 # 원본 데이터 그리드 크기 (고정)
     DEFAULT_INTERPOLATED_GRID_SIZE = 24 # 초기 보간된 그리드 크기
@@ -210,10 +271,11 @@ class OutputModule(QWidget):
         self.fire_alert_triggered = False
         self.smoke_alert_triggered = False
         self.data_signal = data_signal_obj
-        self.data_signal.update_data_signal.connect(self.update_display)
         self.grid_cells = []
         self.heatmap_layout = None # 히트맵 레이아웃을 저장할 변수 추가
         self.current_data_package = None # 마지막으로 받은 데이터 패키지를 저장
+        self.data_signal.update_data_signal.connect(self.update_display)
+        self.data_signal.anomaly_detected_signal.connect(self.update_anomaly_count)
 
         self.gaussian_sigma = 0.8 # 가우시안 필터의 시그마(표준편차) 값. 조절 가능
 
@@ -225,6 +287,12 @@ class OutputModule(QWidget):
         self.display_degree = False
         
         self.init_ui()
+    # [추가] DetectionModule로부터 받은 카운트로 라벨을 업데이트하는 슬롯
+    def update_anomaly_count(self, count):
+        self.anomaly_count = count
+        self.anomaly_count_label.setText(f"이상 감지: {self.anomaly_count} 회")
+        # 필요하다면 여기서 경고 팝업을 띄울 수도 있습니다.
+        # self.show_alert_popup(...)
 
     def init_ui(self):
         self.setObjectName("MainWindow")
@@ -514,8 +582,8 @@ class OutputModule(QWidget):
             self.update_heatmap(values) # 매번 최신 데이터를 기반으로 히트맵 업데이트
 
     def handle_anomaly(self, anomaly_type, current_time):
-        self.anomaly_count += 1
-        self.anomaly_count_label.setText(f"이상 감지: {self.anomaly_count} 회")
+        # self.anomaly_count += 1
+        # self.anomaly_count_label.setText(f"이상 감지: {self.anomaly_count} 회")
         QApplication.processEvents()
         self.show_alert_popup(f"{anomaly_type}가 감지되었습니다!", f"시간: {current_time}\n시스템 로그를 확인하세요.")
 
@@ -657,17 +725,73 @@ class OutputModule(QWidget):
 
         return QColor(r, g, b)
 
+# [추가] 실제 센서 데이터를 생성하고 큐에 넣는 역할을 하는 스레드
+class DataGeneratorThread(QThread):
+    def __init__(self, data_queue, data_signal_obj):
+        super().__init__()
+        self.data_queue = data_queue
+        self.signal = data_signal_obj
+        self.running = True
+        self.time_counter = 0
+
+    def run(self):
+        while self.running:
+            self.time_counter += 1
+            # 8x8 원본 데이터 생성 (평균 25도, 가끔 35도 이상 값 발생)
+            base_temps = np.random.normal(25.0, 2.0, OutputModule.ORIGINAL_GRID_SIZE**2)
+            if random.random() < 0.2: # 20% 확률로 이상 고온 발생
+                anomaly_index = random.randint(0, 63)
+                base_temps[anomaly_index] = random.uniform(35.0, 45.0)
+
+            data_package = {
+                'time': datetime.now().strftime("%H:%M:%S"),
+                'values': base_temps.tolist(),
+                'sensor_degree': np.mean(base_temps) + random.uniform(-0.5, 0.5),
+                'etc': (round(random.uniform(20,80),1), round(random.uniform(20,80),1)),
+                'fire_detected': random.random() < 0.05,
+                'smoke_detected': random.random() < 0.02,
+            }
+            # DetectionModule로 데이터 전송
+            self.data_queue.put(data_package)
+            # GUI로 데이터 전송
+            self.signal.update_data_signal.emit(data_package)
+            
+            time.sleep(1) # 1초 대기
+
+    def stop(self):
+        self.running = False
+        self.wait()
+        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(GLOBAL_STYLESHEET)
+    
     primary_screen = app.primaryScreen()
     available_rect = primary_screen.availableGeometry()
 
+    # 1. 데이터 통신을 위한 큐와 시그널 객체 생성
+    detection_queue = queue.Queue()
     data_signal = DataSignal()
+    
+    # 2. GUI 인스턴스 생성
     output_gui = OutputModule(data_signal, available_rect)
-
     output_gui.showMaximized()
+
+    # 3. 데이터 생성 스레드와 데이터 감지 스레드 인스턴스 생성
+    data_generator = DataGeneratorThread(detection_queue, data_signal)
+    # DetectionModule에 data_signal 객체 전달
+    detection_module = DetectionModule(detection_queue, data_signal, threshold=10.0)
+    
+    # 4. 프로그램 종료 시 스레드가 안전하게 종료되도록 설정
+    app.aboutToQuit.connect(data_generator.stop)
+    app.aboutToQuit.connect(detection_module.stop)
+
+    # 5. 스레드 시작
+    data_generator.start()
+    detection_module.start()
+
+    sys.exit(app.exec())
 
     class DataGenerator:
         def __init__(self, signal_obj):
@@ -696,4 +820,3 @@ if __name__ == '__main__':
 
     data_gen = DataGenerator(data_signal)
     data_gen.start()
-    sys.exit(app.exec())
