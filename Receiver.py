@@ -3,6 +3,8 @@ import time
 from datetime import datetime
 import threading
 import random # 테스트용 임의 값 생성을 위해 추가
+import csv
+import os
 # import numpy as np # ReceiverModule에서는 직접적으로 사용되지 않으므로 제거 가능
 
 class ReceiverModule(threading.Thread):
@@ -54,7 +56,7 @@ class ReceiverModule(threading.Thread):
                         # 'MOD'를 받으면 새 패키지 시작으로 간주하고 버퍼 초기화
                         self.current_values_buffer = []
                         self.expecting_data = True
-                        print("ReceiverModule: 'MOD' 수신. 새 데이터 패키지 시작.")
+                        # print("ReceiverModule: 'MOD' 수신. 새 데이터 패키지 시작.")
                     elif self.expecting_data:
                         # 'MOD'를 받은 상태에서 숫자 데이터를 기대
                         try:
@@ -62,18 +64,40 @@ class ReceiverModule(threading.Thread):
                             self.current_values_buffer.append(value)
                             # print(f"ReceiverModule: 값 수신 - 현재 버퍼 크기: {len(self.current_values_buffer)}")
 
-                            if len(self.current_values_buffer) == 64:
+                            if len(self.current_values_buffer) == 67:
+                                # 센서 주변 온도값 1 + 64개값 + 불명 2개값
                                 # 64개의 값이 모두 모이면 패키지 완성
-                                received_values = self.current_values_buffer[:] # 현재 버퍼 복사
+                                sensor_degree = self.current_values_buffer[0]
+                                received_values = self.current_values_buffer[1:65] # 현재 버퍼 복사
+                                etc_values = self.current_values_buffer[65:] 
                                 self.current_values_buffer = [] # 버퍼 초기화 (다음 MOD를 위해)
                                 self.expecting_data = False     # 다음 'MOD'를 기다림
                                 
                                 # 완성된 패키지를 큐에 전달
                                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                                data_package = {'time': current_time, 'values': received_values}
+                                
+                                data_package = {'sensor_degree': sensor_degree, 'time': current_time, 'values': received_values, 'etc': etc_values}
                                 self.output_queue.put(data_package)
                                 self.detection_queue.put(data_package)
-                                print(f"ReceiverModule: 64개 값 패키지 완성 및 큐에 추가. 첫 5개 값: {received_values[:5]}")
+                                # print(f"ReceiverModule: 64개 값 패키지 완성 및 큐에 추가. 첫 5개 값: {received_values[:5]}")
+                                
+                                if not os.path.exists('./degree_test.csv'):
+                                    write_type = 'w'
+                                else:
+                                    write_type = 'a'
+                                
+                                with open('./degree_test.csv', write_type , newline='') as csvfile:
+                                        csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                                        result = [datetime.now(), sensor_degree]
+                                        result.extend(received_values)
+                                        print(result)
+                                        csv_writer.writerow(result)
+                                        # csv_writer.writerow([datetime.now()])
+                                        # csv_writer.writerow([sensor_degree])
+                                        # for row in received_values:
+                                            # csv_writer.writerow([row])
+                                    
+                                    
                         except ValueError:
                             # 숫자로 변환할 수 없는 데이터가 들어오면 무시하고 버퍼 리셋
                             print(f"ReceiverModule: 경고: 'MOD' 후 숫자가 아닌 값 수신: '{raw_data}'. 버퍼 초기화.")

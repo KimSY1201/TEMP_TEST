@@ -32,10 +32,10 @@ QWidget {
 
 /* 제목 레이블 스타일 */
 QLabel[class="TitleLabel"] {
-    font-size: 20px; /* 16px -> 20px */
+    font-size: 16px; /* 16px -> 20px */
     font-weight: bold;
     color: #FFFFFF; /* 흰색 */
-    padding: 5px;
+    padding: 2px;
 }
 
 /* 일반 정보 레이블 스타일 */
@@ -238,10 +238,19 @@ class OutputModule(QWidget):
         left_panel_layout = QVBoxLayout(left_panel)
         left_panel_layout.setSpacing(20)
 
+        
+        self.sensor_temp_label = QLabel("센서 온도: N/A")
+        self.sensor_temp_label.setProperty("class", "TitleLabel")
+        
         self.max_temp_label = QLabel("최고 온도: N/A")
         self.max_temp_label.setProperty("class", "TitleLabel")
         self.avg_temp_label = QLabel("평균 온도: N/A")
         self.avg_temp_label.setProperty("class", "TitleLabel")
+        
+        self.etc_label = QLabel("기타: N/A")
+        self.etc_label.setProperty("class", "TitleLabel")
+        
+        
         self.anomaly_count_label = QLabel(f"이상 감지: {self.anomaly_count} 회")
         self.anomaly_count_label.setObjectName("AnomalyCountLabel")
 
@@ -316,8 +325,10 @@ class OutputModule(QWidget):
         self.time_label = QLabel("시간: N/A")
         self.time_label.setFont(QFont("Arial", 9))
 
+        left_panel_layout.addWidget(self.sensor_temp_label)
         left_panel_layout.addWidget(self.max_temp_label)
         left_panel_layout.addWidget(self.avg_temp_label)
+        left_panel_layout.addWidget(self.etc_label)
         left_panel_layout.addWidget(self.anomaly_count_label)
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
@@ -395,6 +406,7 @@ class OutputModule(QWidget):
     def _redraw_heatmap(self):
         if self.current_data_package:
             self.update_heatmap(self.current_data_package.get('values', []))
+            self.showMaximized() # 현재 윈도우를 최대화합니다.
 
     def _create_heatmap_cells(self):
         # 기존 셀들을 모두 제거
@@ -461,18 +473,24 @@ class OutputModule(QWidget):
         # 현재 데이터 패키지를 저장 (그리드 크기 변경 시 다시 사용하기 위해)
         self.current_data_package = data_package
 
+        sensor_degree = data_package.get('sensor_degree', 'N/A')
         current_time = data_package.get('time', 'N/A')
         values = data_package.get('values', [])
+        etc = data_package.get('etc', [])
         fire_detected = data_package.get('fire_detected', False)
         smoke_detected = data_package.get('smoke_detected', False)
 
         self.time_label.setText(f"시간: {current_time}")
 
         if values:
+            
             avg_temp = np.mean(values)
             max_temp = np.max(values)
+            
+            self.sensor_temp_label.setText(f"센서 온도: {sensor_degree:.1f}°C")
             self.max_temp_label.setText(f"최고 온도: {max_temp:.1f}°C")
             self.avg_temp_label.setText(f"평균 온도: {avg_temp:.1f}°C")
+            self.etc_label.setText(f"기타: {etc[0], etc[1]}")
         else:
             self.max_temp_label.setText(f"최고 온도: N/A")
             self.avg_temp_label.setText("평균 온도: N/A")
@@ -571,7 +589,7 @@ class OutputModule(QWidget):
                     cell.setStyleSheet(f"background-color: {color.name()}; color: {text_color}; font-weight: bold; font-size: {self.font_size}px; border: none;")
                 else:
                     print(f"Debug: Attempted to access out-of-bounds cell [{i}][{j}] for interpolated grid of size {interpolated_grid.shape}. Grid cells size: {len(self.grid_cells)}x{len(self.grid_cells[0] if self.grid_cells else 0)}")
-        self.showMaximized() # 현재 윈도우를 최대화합니다.
+        
 
 
     def show_alert_popup(self, title, message):
