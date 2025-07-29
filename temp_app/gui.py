@@ -645,7 +645,7 @@ class OutputModule(QWidget):
             if len(hotspots) > 0:
                 max_temp_hotspot = max(hotspots, key=lambda x: x['max_temp'])
                 # hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C)"
-                hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C, center:({hotspots[0]['center']:d}))"
+                hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C, center:({hotspots[0]['center']:.1f}))"
             self.hotspot_info_label.setText(hotspot_info)
         else:
             self.hotspot_info_label.setText("감지된 열원: 0개")
