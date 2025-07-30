@@ -173,6 +173,97 @@ class DraggableNumberLabel(QLabel):
             self._is_dragging = False
             self.unsetCursor()
         super().mouseReleaseEvent(event)
+        
+        
+class HeatmapOverlay(QWidget):
+    """열원 감지 오버레이만을 담당하는 위젯"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.hotspots = []
+        self.cell_size = 0
+        self.interpolated_grid_size = 24
+        self.original_grid_size = 8
+        
+        # 투명 배경 설정
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        self.setStyleSheet("background: transparent;")
+
+    def set_hotspots(self, hotspots, cell_size, grid_size):
+        """열원 정보와 그리드 정보 업데이트"""
+        self.hotspots = hotspots or []
+        self.cell_size = cell_size
+        self.interpolated_grid_size = grid_size
+        # print(f"Overlay: Setting {len(self.hotspots)} hotspots, cell_size: {cell_size}")
+        self.update()  # 다시 그리기 요청
+
+    def paintEvent(self, event):
+        """열원 감지 결과를 오버레이로 표시"""
+        super().paintEvent(event)
+        
+        # print(f"Overlay paintEvent called, hotspots: {len(self.hotspots)}")
+        
+        if not self.hotspots or self.cell_size == 0:
+            return
+        
+        if self.hotspots[0]['size'] < 6 or self.hotspots[0]['size'] > 20 :
+            return
+            
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # 스케일 팩터 계산 (8x8 -> interpolated_grid_size)
+        scale_factor = self.interpolated_grid_size / self.original_grid_size
+        
+        for hotspot in self.hotspots:
+            try:
+                center_x, center_y = hotspot['center']
+                
+                # 8x8 좌표를 interpolated_grid_size 좌표로 변환
+                scaled_x = center_x * scale_factor
+                scaled_y = center_y * scale_factor
+                
+                # 픽셀 좌표로 변환
+                pixel_x = int(scaled_x * self.cell_size + self.cell_size / 2)
+                pixel_y = int(scaled_y * self.cell_size + self.cell_size / 2)
+                
+                # 열원 크기에 따른 원 크기 결정
+                circle_radius = max(100, min(100, hotspot.get('size', 1) * 5))
+                
+                # 온도에 따른 색상 결정
+                max_temp = hotspot.get('max_temp', 25)
+                if max_temp > 35:
+                    color = QColor(255, 0, 0, 150)  # 빨간색 (고온)
+                elif max_temp > 30:
+                    color = QColor(255, 165, 0, 150)  # 주황색 (중온)
+                else:
+                    color = QColor(255, 255, 0, 150)  # 노란색 (저온)
+                
+                # 외곽선과 채우기 설정
+                painter.setPen(QPen(QColor(255, 255, 255), 3))
+                painter.setBrush(QBrush(color))
+                
+                # 원 그리기
+                painter.drawEllipse(pixel_x - circle_radius, pixel_y - circle_radius, 
+                                  circle_radius * 2, circle_radius * 2)
+                
+                # 중심점 표시
+                painter.setPen(QPen(QColor(0, 0, 0), 4))
+                painter.drawPoint(pixel_x, pixel_y)
+                painter.setPen(QPen(QColor(255, 255, 255), 2))
+                painter.drawPoint(pixel_x, pixel_y)
+                
+                # 열원 ID와 온도 표시
+                painter.setPen(QPen(QColor(255, 255, 255)))
+                painter.setFont(QFont("Arial", 10, QFont.Weight.Bold))
+                text = f"H{hotspot.get('id', 0)}\n{max_temp:.1f}°C"
+                painter.drawText(pixel_x + circle_radius + 5, pixel_y - 5, text)
+                
+                # print(f"Drew hotspot {hotspot.get('id', 0)} at ({pixel_x}, {pixel_y}) with radius {circle_radius}")
+                
+            except Exception as e:
+                print(f"Error drawing hotspot {hotspot}: {e}")
 
 class HeatmapWidget(QWidget):
     """히트맵과 열원 감지 오버레이를 표시하는 커스텀 위젯"""
@@ -182,20 +273,32 @@ class HeatmapWidget(QWidget):
         self.max_height = max_height - 40
         self.max_width = max_width        
         self.grid_cells = []
-        self.hotspots = []  # 감지된 열원 정보
+        self.hotspots = []
         self.interpolated_grid_size = 24
         self.original_grid_size = 8
         self.cell_size = self.max_height // self.interpolated_grid_size
         self.gaussian_sigma = 0.9
         self.min_temp = 19.0
         self.max_temp = 32.0
-        self.avg_temp = None
+        
         self.display_temperature = False
         self.current_values = []
+        
+        # 메인 레이아웃 설정
         self.main_layout = QGridLayout(self)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0,0,0,0)
+        
+        # 오버레이 위젯 생성
+        self.overlay = HeatmapOverlay(self)
+        
         self.init_heatmap()
+
+    def resizeEvent(self, event):
+        """위젯 크기 변경 시 오버레이 크기도 조정"""
+        super().resizeEvent(event)
+        if hasattr(self, 'overlay'):
+            self.overlay.resize(self.size())
 
     def init_heatmap(self):
         """히트맵 그리드 초기화"""
@@ -214,6 +317,10 @@ class HeatmapWidget(QWidget):
                 self.main_layout.addWidget(cell, i, j)
                 row_cells.append(cell)
             self.grid_cells.append(row_cells)
+        
+        # 오버레이 위젯을 맨 위에 배치
+        self.overlay.resize(self.size())
+        self.overlay.raise_()
         
     def clear_grid(self):
         """기존 그리드 셀들 제거"""
@@ -262,9 +369,7 @@ class HeatmapWidget(QWidget):
                     color = self.get_color_from_value(value)
                     cell = self.grid_cells[i][j]
                     
-                    
                     text = f"{value:.1f}" if self.display_temperature else ""
-                    # print(self.avg_temp)
                     cell.setText(text)
                     cell.setStyleSheet(f"""
                         background-color: {color.name()}; 
@@ -274,8 +379,8 @@ class HeatmapWidget(QWidget):
                         border: none;
                     """)
 
-                    if text is not "":
-                        if float(text) < float(avg_value)+0.4:
+                    if text != "":
+                        if float(text) < float(avg_value) + 0.4:
                             cell.setText(text)
                             cell.setStyleSheet(f"""
                                 background-color: black; 
@@ -284,60 +389,10 @@ class HeatmapWidget(QWidget):
                                 font-size: {font_size}px; 
                                 border: none;
                             """)
-                        else:
-                            pass
-                   
-        # 위젯 다시 그리기 (열원 오버레이 표시를 위해)
-        self.update()
-
-    def paintEvent(self, event):
-        """열원 감지 결과를 오버레이로 표시"""
-        super().paintEvent(event)
         
-        if not self.hotspots:
-            return
-            
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
-        # 스케일 팩터 계산 (8x8 -> 24x24)
-        scale_factor = self.interpolated_grid_size / self.original_grid_size
-        
-        for hotspot in self.hotspots:
-            center_x, center_y = hotspot['center']
-            
-            # 8x8 좌표를 24x24 좌표로 변환
-            scaled_x = center_x * scale_factor
-            scaled_y = center_y * scale_factor
-            
-            # 픽셀 좌표로 변환
-            pixel_x = int(scaled_x * self.cell_size + self.cell_size / 2)
-            pixel_y = int(scaled_y * self.cell_size + self.cell_size / 2)
-            
-            # 열원 크기에 따른 원 크기 결정
-            circle_radius = max(100, min(30, hotspot['size'] * 3))
-            
-            # 온도에 따른 색상 결정
-            if hotspot['max_temp'] > 35:
-                color = QColor(255, 0, 0, 180)  # 빨간색 (고온)
-            elif hotspot['max_temp'] > 30:
-                color = QColor(255, 165, 0, 180)  # 주황색 (중온)
-            else:
-                color = QColor(255, 255, 0, 180)  # 노란색 (저온)
-            
-            # 원 그리기
-            painter.setPen(QPen(QColor(255, 255, 255), 2))
-            painter.setBrush(QBrush(color))
-            painter.drawEllipse(pixel_x - circle_radius, pixel_y - circle_radius, 
-                              circle_radius * 2, circle_radius * 2)
-            
-            # 중심점 표시
-            painter.setPen(QPen(QColor(255, 255, 255), 3))
-            painter.drawPoint(pixel_x, pixel_y)
-            
-            # 열원 ID 표시
-            painter.setPen(QPen(QColor(255, 255, 255)))
-            painter.drawText(pixel_x + circle_radius + 5, pixel_y, f"H{hotspot['id']}")
+        # 오버레이 위젯에 열원 정보 전달
+        # print(f"Updating overlay with {len(self.hotspots)} hotspots")
+        self.overlay.set_hotspots(self.hotspots, self.cell_size, self.interpolated_grid_size)
 
     def get_color_from_value(self, value):
         """온도 값에 따른 색상 반환"""
@@ -380,12 +435,12 @@ class HeatmapWidget(QWidget):
     def set_grid_size(self, size):
         """그리드 크기 설정"""
         if size != self.interpolated_grid_size:
-            print('size', size)
+            # print('size', size)
             self.interpolated_grid_size = size
-            self.cell_size = self.max_height // self.interpolated_grid_size  # 적절한 셀 크기 계산
-            print(self.cell_size)
+            self.cell_size = self.max_height // self.interpolated_grid_size
+            # print(self.cell_size)
             self.init_heatmap()
-            print('where')
+            # print('where')
             if self.current_values:
                 self.update_heatmap(self.current_values, self.hotspots)
 
@@ -658,12 +713,12 @@ class OutputModule(QWidget):
 
         # 열원 정보 업데이트
         if hotspots:
-            print(hotspots)
+            # print(hotspots)
             hotspot_info = f"감지된 열원: {len(hotspots)}개"
             if len(hotspots) > 0:
                 max_temp_hotspot = max(hotspots, key=lambda x: x['max_temp'])
-                # hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C)"
-                hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C, center:({hotspots[0]['center']:.1f}))"
+                hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C)"
+                # hotspot_info += f" (최고: {max_temp_hotspot['max_temp']:.1f}°C, center: {hotspots[0]['center'][0]:.1f},{hotspots[0]['center'][1]:.1f})"
             self.hotspot_info_label.setText(hotspot_info)
         else:
             self.hotspot_info_label.setText("감지된 열원: 0개")

@@ -5,7 +5,140 @@ import time
 import queue
 from scipy.ndimage import gaussian_filter
 from scipy.ndimage import label, center_of_mass
+from collections import deque
 import cv2
+
+class HotspotTracker:
+    """열원 추적을 위한 클래스"""
+    
+    def __init__(self, max_history=10, similarity_threshold=1.5, persistence_threshold=3):
+        self.max_history = max_history  # 최대 보관할 이력 개수
+        self.similarity_threshold = similarity_threshold  # 유사성 판단 거리 임계값
+        self.persistence_threshold = persistence_threshold  # 열원으로 인정하는 최소 지속 횟수
+        self.hotspot_history = deque(maxlen=max_history)  # 열원 이력 버퍼
+        self.tracked_hotspots = {}  # 추적 중인 열원들 {id: tracker_info}
+        self.next_id = 1  # 다음 할당할 열원 ID
+        
+    def update(self, current_hotspots):
+        """현재 감지된 열원들과 이력을 비교하여 추적 업데이트"""
+        # 현재 프레임을 이력에 추가
+        self.hotspot_history.append(current_hotspots)
+        
+        # 기존 추적 중인 열원들과 매칭
+        matched_hotspots = []
+        unmatched_current = list(current_hotspots)
+        
+        # 기존 추적 중인 열원들과 현재 열원들 매칭
+        for tracker_id, tracker_info in list(self.tracked_hotspots.items()):
+            best_match = None
+            min_distance = float('inf')
+            
+            # 현재 열원들 중에서 가장 가까운 것 찾기
+            for i, current_hotspot in enumerate(unmatched_current):
+                distance = self._calculate_distance(tracker_info['last_position'], current_hotspot['center'])
+                if distance < min_distance and distance < self.similarity_threshold:
+                    min_distance = distance
+                    best_match = (i, current_hotspot)
+            
+            if best_match:
+                # 매칭된 경우
+                match_index, matched_hotspot = best_match
+                self._update_tracker(tracker_id, matched_hotspot)
+                matched_hotspots.append(self._create_tracked_hotspot(tracker_id, matched_hotspot))
+                unmatched_current.pop(match_index)
+            else:
+                # 매칭되지 않은 경우 - 카운터 감소
+                tracker_info['missed_count'] += 1
+                if tracker_info['missed_count'] > 3:  # 3프레임 연속 놓치면 제거
+                    del self.tracked_hotspots[tracker_id]
+        
+        # 매칭되지 않은 새로운 열원들을 새 추적기로 등록
+        for new_hotspot in unmatched_current:
+            new_id = self.next_id
+            self.next_id += 1
+            self.tracked_hotspots[new_id] = {
+                'id': new_id,
+                'first_detected': datetime.now(),
+                'last_position': new_hotspot['center'],
+                'detection_count': 1,
+                'missed_count': 0,
+                'temperature_history': [new_hotspot['max_temp']],
+                'size_history': [new_hotspot['size']],
+                'is_confirmed': False
+            }
+        
+        # 지속성이 확인된 열원들만 반환
+        confirmed_hotspots = []
+        for tracker_id, tracker_info in self.tracked_hotspots.items():
+            if tracker_info['detection_count'] >= self.persistence_threshold:
+                tracker_info['is_confirmed'] = True
+                # 현재 프레임에서 매칭된 열원이 있으면 그 정보 사용
+                current_hotspot = None
+                for hotspot in matched_hotspots:
+                    if hotspot['tracker_id'] == tracker_id:
+                        current_hotspot = hotspot
+                        break
+                
+                if current_hotspot:
+                    confirmed_hotspots.append(current_hotspot)
+        
+        return confirmed_hotspots
+    
+    def _calculate_distance(self, pos1, pos2):
+        """두 위치 간의 유클리드 거리 계산"""
+        return np.sqrt((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
+    
+    def _update_tracker(self, tracker_id, matched_hotspot):
+        """추적기 정보 업데이트"""
+        tracker_info = self.tracked_hotspots[tracker_id]
+        tracker_info['last_position'] = matched_hotspot['center']
+        tracker_info['detection_count'] += 1
+        tracker_info['missed_count'] = 0
+        tracker_info['temperature_history'].append(matched_hotspot['max_temp'])
+        tracker_info['size_history'].append(matched_hotspot['size'])
+        
+        # 이력 길이 제한
+        if len(tracker_info['temperature_history']) > self.max_history:
+            tracker_info['temperature_history'].pop(0)
+        if len(tracker_info['size_history']) > self.max_history:
+            tracker_info['size_history'].pop(0)
+    
+    def _create_tracked_hotspot(self, tracker_id, current_hotspot):
+        """추적 정보가 포함된 열원 데이터 생성"""
+        tracker_info = self.tracked_hotspots[tracker_id]
+        
+        # 온도와 크기의 평균값 계산
+        avg_temp = np.mean(tracker_info['temperature_history'])
+        avg_size = np.mean(tracker_info['size_history'])
+        
+        tracked_hotspot = current_hotspot.copy()
+        tracked_hotspot.update({
+            'tracker_id': tracker_id,
+            'detection_count': tracker_info['detection_count'],
+            'is_confirmed': tracker_info['is_confirmed'],
+            'avg_temp_history': float(avg_temp),
+            'avg_size_history': float(avg_size),
+            'temperature_trend': self._calculate_trend(tracker_info['temperature_history']),
+            'first_detected': tracker_info['first_detected'].strftime("%H:%M:%S")
+        })
+        
+        return tracked_hotspot
+    
+    def _calculate_trend(self, values):
+        """값들의 트렌드 계산 (증가/감소/안정)"""
+        if len(values) < 3:
+            return "insufficient_data"
+        
+        recent_avg = np.mean(values[-3:])
+        older_avg = np.mean(values[:-3]) if len(values) > 3 else values[0]
+        
+        diff = recent_avg - older_avg
+        if diff > 0.5:
+            return "increasing"
+        elif diff < -0.5:
+            return "decreasing"
+        else:
+            return "stable"
 
 class DetectionModule(threading.Thread):
     def __init__(self, input_queue, output_queue, base_temperature=25.0, threshold=2.0, filename="detected_values.txt"):
@@ -27,6 +160,18 @@ class DetectionModule(threading.Thread):
         # 열원 감지 설정
         self.min_hotspot_size = 1  # 최소 열원 크기 (픽셀)
         self.max_hotspot_size = 16  # 최대 열원 크기 (픽셀)
+        
+        # 열원 추적기 초기화
+        self.hotspot_tracker = HotspotTracker(
+            max_history=10,           # 최대 10프레임 이력 보관
+            similarity_threshold=1.5, # 1.5 픽셀 내에서 같은 열원으로 인정
+            persistence_threshold=3   # 3번 이상 감지되면 확실한 열원으로 인정
+        )
+        
+        # 데이터 버퍼 (이전 프레임들 저장)
+        self.data_buffer = deque(maxlen=20)  # 최대 20프레임 보관
+        
+        print("DetectionModule initialized with hotspot tracking")
 
     def run(self):
         while self.running:
@@ -60,11 +205,28 @@ class DetectionModule(threading.Thread):
         # 8x8 배열로 변환
         values_array = np.array(values).reshape((self.grid_size, self.grid_size))
         
+        # 데이터 버퍼에 추가
+        self.data_buffer.append({
+            'time': current_time,
+            'values_array': values_array.copy(),
+            'timestamp': datetime.now()
+        })
+        
         # 이상 감지 수행
         detection_result = self.detect_anomalies(values_array, current_time)
         
-        # 열원 감지 수행
-        hotspot_data = self.detect_hotspots(values_array)
+        # 원시 열원 감지 수행
+        raw_hotspots = self.detect_hotspots(values_array)
+        
+        # 열원 추적 및 지속성 확인
+        confirmed_hotspots = self.hotspot_tracker.update(raw_hotspots)
+        
+        # 추가적인 유사성 검증
+        validated_hotspots = self.validate_hotspots_with_history(confirmed_hotspots)
+        
+        print(f"DetectionModule: Raw hotspots: {len(raw_hotspots)}, "
+              f"Confirmed: {len(confirmed_hotspots)}, "
+              f"Validated: {len(validated_hotspots)}")
         
         # GUI로 전달할 데이터 패키지 구성
         gui_data_package = {
@@ -75,11 +237,13 @@ class DetectionModule(threading.Thread):
             'fire_detected': detection_result['fire_detected'],
             'smoke_detected': detection_result['smoke_detected'],
             'anomaly_count': self.anomaly_total_count,
-            'hotspots': hotspot_data,  # 감지된 열원 정보
+            'hotspots': validated_hotspots,  # 검증된 열원 정보
             'detection_stats': {
                 'max_temp': detection_result['max_temp'],
                 'avg_temp': detection_result['avg_temp'],
-                'detection_limit': detection_result['detection_limit']
+                'detection_limit': detection_result['detection_limit'],
+                'raw_hotspot_count': len(raw_hotspots),
+                'confirmed_hotspot_count': len(confirmed_hotspots)
             }
         }
         
@@ -131,13 +295,13 @@ class DetectionModule(threading.Thread):
 
     def detect_hotspots(self, values_array):
         """
-        열원의 위치와 형태를 감지
+        열원의 위치와 형태를 감지 (원시 감지)
         """
         # 가우시안 필터 적용
         filtered_array = gaussian_filter(values_array, sigma=self.gaussian_sigma)
         
         # 임계값을 넘는 영역 찾기
-        threshold_temp = self.base_temperature + self.threshold * 0.7  # 좀 더 낮은 임계값 사용
+        threshold_temp = values_array.mean() + 0.6    # 동적 임계값 사용
         binary_mask = filtered_array > threshold_temp
         
         # 연결된 구성요소 찾기 (열원 클러스터링)
@@ -182,6 +346,80 @@ class DetectionModule(threading.Thread):
                 hotspots.append(hotspot_info)
         
         return hotspots
+
+    def validate_hotspots_with_history(self, confirmed_hotspots):
+        """
+        버퍼에 저장된 이전 데이터와 비교하여 열원 유사성 검증
+        """
+        if len(self.data_buffer) < 3:  # 최소 3프레임 필요
+            return confirmed_hotspots
+        
+        validated_hotspots = []
+        
+        for hotspot in confirmed_hotspots:
+            similarity_score = self.calculate_hotspot_similarity(hotspot)
+            
+            # 유사성 점수가 임계값 이상이면 유효한 열원으로 인정
+            if similarity_score > 0.6:  # 60% 이상 유사하면 유효
+                hotspot['similarity_score'] = float(similarity_score)
+                hotspot['validation_status'] = 'validated'
+                validated_hotspots.append(hotspot)
+            else:
+                hotspot['similarity_score'] = float(similarity_score)
+                hotspot['validation_status'] = 'rejected'
+                print(f"Hotspot {hotspot.get('tracker_id', 'unknown')} rejected due to low similarity: {similarity_score:.3f}")
+        
+        return validated_hotspots
+
+    def calculate_hotspot_similarity(self, current_hotspot):
+        """
+        현재 열원과 이전 프레임들의 유사성 계산
+        """
+        if len(self.data_buffer) < 2:
+            return 0.0
+        
+        current_center = current_hotspot['center']
+        current_temp = current_hotspot['max_temp']
+        current_size = current_hotspot['size']
+        
+        similarity_scores = []
+        
+        # 최근 5프레임과 비교
+        recent_frames = list(self.data_buffer)[-5:]
+        
+        for frame_data in recent_frames:
+            frame_array = frame_data['values_array']
+            frame_hotspots = self.detect_hotspots(frame_array)
+            
+            # 현재 열원과 가장 가까운 이전 열원 찾기
+            best_match_score = 0.0
+            
+            for prev_hotspot in frame_hotspots:
+                # 위치 유사성
+                distance = np.sqrt((current_center[0] - prev_hotspot['center'][0])**2 + 
+                                 (current_center[1] - prev_hotspot['center'][1])**2)
+                position_similarity = max(0, 1 - distance / 3.0)  # 3픽셀 이내에서 유사성 계산
+                
+                # 온도 유사성
+                temp_diff = abs(current_temp - prev_hotspot['max_temp'])
+                temp_similarity = max(0, 1 - temp_diff / 5.0)  # 5도 이내에서 유사성 계산
+                
+                # 크기 유사성
+                size_diff = abs(current_size - prev_hotspot['size'])
+                size_similarity = max(0, 1 - size_diff / max(current_size, prev_hotspot['size']))
+                
+                # 전체 유사성 점수 (가중 평균)
+                total_similarity = (position_similarity * 0.5 + 
+                                  temp_similarity * 0.3 + 
+                                  size_similarity * 0.2)
+                
+                best_match_score = max(best_match_score, total_similarity)
+            
+            if best_match_score > 0:
+                similarity_scores.append(best_match_score)
+        
+        # 평균 유사성 점수 반환
+        return np.mean(similarity_scores) if similarity_scores else 0.0
 
     def log_detection(self, current_time, filtered_array, detected_indices, average, detection_limit):
         """
