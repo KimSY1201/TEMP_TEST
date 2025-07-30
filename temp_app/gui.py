@@ -186,9 +186,10 @@ class HeatmapWidget(QWidget):
         self.interpolated_grid_size = 24
         self.original_grid_size = 8
         self.cell_size = self.max_height // self.interpolated_grid_size
-        self.gaussian_sigma = 0.7
+        self.gaussian_sigma = 0.9
         self.min_temp = 19.0
         self.max_temp = 32.0
+        self.avg_temp = None
         self.display_temperature = False
         self.current_values = []
         self.main_layout = QGridLayout(self)
@@ -252,6 +253,7 @@ class HeatmapWidget(QWidget):
         interpolated_grid = gaussian_filter(interpolated_grid, sigma=self.gaussian_sigma)
         
         # 셀 업데이트
+        avg_value = interpolated_grid.mean()
         font_size = max(8, self.cell_size // 4)
         for i in range(self.interpolated_grid_size):
             for j in range(self.interpolated_grid_size):
@@ -260,7 +262,9 @@ class HeatmapWidget(QWidget):
                     color = self.get_color_from_value(value)
                     cell = self.grid_cells[i][j]
                     
+                    
                     text = f"{value:.1f}" if self.display_temperature else ""
+                    # print(self.avg_temp)
                     cell.setText(text)
                     cell.setStyleSheet(f"""
                         background-color: {color.name()}; 
@@ -269,7 +273,20 @@ class HeatmapWidget(QWidget):
                         font-size: {font_size}px; 
                         border: none;
                     """)
-        
+
+                    if text is not "":
+                        if float(text) < float(avg_value)+0.4:
+                            cell.setText(text)
+                            cell.setStyleSheet(f"""
+                                background-color: black; 
+                                color: white; 
+                                font-weight: bold; 
+                                font-size: {font_size}px; 
+                                border: none;
+                            """)
+                        else:
+                            pass
+                   
         # 위젯 다시 그리기 (열원 오버레이 표시를 위해)
         self.update()
 
@@ -624,6 +641,7 @@ class OutputModule(QWidget):
             self.max_temp_label.setText(f"최고 온도: {detection_stats.get('max_temp', 0):.1f}°C")
             self.avg_temp_label.setText(f"평균 온도: {detection_stats.get('avg_temp', 0):.1f}°C")
             self.etc_label.setText(f"기타: {etc}")
+            # HeatmapWidget.avg_temp = f"{detection_stats.get('avg_temp', 0):.1f}"
         else:
             self.max_temp_label.setText("최고 온도: N/A")
             self.avg_temp_label.setText("평균 온도: N/A")
