@@ -19012,3 +19012,2554 @@ Overall Average: 24.34°C
 Detection Limit: 30.0°C
 - Position (2,0): 30.00°C (기준 30.0°C 초과)
 
+--- Detected at 2025-07-31 09:25:29 ---
+누적 이상 감지 횟수: 1회
+Overall Average: 24.34°C
+Detection Limit: 30.0°C
+- Position (7,4): 31.44°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:34 ---
+누적 이상 감지 횟수: 2회
+Overall Average: 25.41°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.03°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:35 ---
+누적 이상 감지 횟수: 3회
+Overall Average: 25.52°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.15°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:35 ---
+누적 이상 감지 횟수: 4회
+Overall Average: 25.35°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.03°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:36 ---
+누적 이상 감지 횟수: 5회
+Overall Average: 25.63°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.45°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:36 ---
+누적 이상 감지 횟수: 6회
+Overall Average: 25.63°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.19°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:36 ---
+누적 이상 감지 횟수: 7회
+Overall Average: 25.71°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.42°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:36 ---
+누적 이상 감지 횟수: 8회
+Overall Average: 25.73°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.44°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:37 ---
+누적 이상 감지 횟수: 9회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.06°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:37 ---
+누적 이상 감지 횟수: 10회
+Overall Average: 25.58°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.26°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:37 ---
+누적 이상 감지 횟수: 11회
+Overall Average: 25.57°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.34°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:38 ---
+누적 이상 감지 횟수: 12회
+Overall Average: 25.50°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.13°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:38 ---
+누적 이상 감지 횟수: 13회
+Overall Average: 25.54°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.17°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:39 ---
+누적 이상 감지 횟수: 14회
+Overall Average: 25.59°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.26°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:39 ---
+누적 이상 감지 횟수: 15회
+Overall Average: 25.77°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.27°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:39 ---
+누적 이상 감지 횟수: 16회
+Overall Average: 25.75°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.37°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:40 ---
+누적 이상 감지 횟수: 17회
+Overall Average: 25.58°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.02°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:40 ---
+누적 이상 감지 횟수: 18회
+Overall Average: 25.49°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.04°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:41 ---
+누적 이상 감지 횟수: 19회
+Overall Average: 25.13°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.11°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:48 ---
+누적 이상 감지 횟수: 20회
+Overall Average: 25.07°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.09°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:56 ---
+누적 이상 감지 횟수: 21회
+Overall Average: 24.91°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.11°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:56 ---
+누적 이상 감지 횟수: 22회
+Overall Average: 24.98°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.03°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:57 ---
+누적 이상 감지 횟수: 23회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.35°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:57 ---
+누적 이상 감지 횟수: 24회
+Overall Average: 25.17°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.27°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:57 ---
+누적 이상 감지 횟수: 25회
+Overall Average: 25.05°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.14°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:57 ---
+누적 이상 감지 횟수: 26회
+Overall Average: 25.02°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.09°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:58 ---
+누적 이상 감지 횟수: 27회
+Overall Average: 25.11°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.37°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:58 ---
+누적 이상 감지 횟수: 28회
+Overall Average: 25.05°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.20°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:58 ---
+누적 이상 감지 횟수: 29회
+Overall Average: 24.93°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.34°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:59 ---
+누적 이상 감지 횟수: 30회
+Overall Average: 25.12°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.58°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:59 ---
+누적 이상 감지 횟수: 31회
+Overall Average: 25.19°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.54°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:26:59 ---
+누적 이상 감지 횟수: 32회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.53°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:00 ---
+누적 이상 감지 횟수: 33회
+Overall Average: 25.13°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:00 ---
+누적 이상 감지 횟수: 34회
+Overall Average: 25.13°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.50°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:00 ---
+누적 이상 감지 횟수: 35회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.46°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:00 ---
+누적 이상 감지 횟수: 36회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.40°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:01 ---
+누적 이상 감지 횟수: 37회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.26°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:01 ---
+누적 이상 감지 횟수: 38회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:01 ---
+누적 이상 감지 횟수: 39회
+Overall Average: 25.02°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.20°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:02 ---
+누적 이상 감지 횟수: 40회
+Overall Average: 25.02°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.30°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:02 ---
+누적 이상 감지 횟수: 41회
+Overall Average: 24.90°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.06°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:02 ---
+누적 이상 감지 횟수: 42회
+Overall Average: 25.07°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:03 ---
+누적 이상 감지 횟수: 43회
+Overall Average: 25.19°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.47°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:03 ---
+누적 이상 감지 횟수: 44회
+Overall Average: 25.13°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.47°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:03 ---
+누적 이상 감지 횟수: 45회
+Overall Average: 25.13°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.49°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:03 ---
+누적 이상 감지 횟수: 46회
+Overall Average: 24.96°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.35°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:04 ---
+누적 이상 감지 횟수: 47회
+Overall Average: 25.16°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.58°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:04 ---
+누적 이상 감지 횟수: 48회
+Overall Average: 25.10°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.46°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:04 ---
+누적 이상 감지 횟수: 49회
+Overall Average: 25.04°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.23°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:05 ---
+누적 이상 감지 횟수: 50회
+Overall Average: 25.08°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.40°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:05 ---
+누적 이상 감지 횟수: 51회
+Overall Average: 24.80°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.08°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:05 ---
+누적 이상 감지 횟수: 52회
+Overall Average: 25.05°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.29°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:05 ---
+누적 이상 감지 횟수: 53회
+Overall Average: 24.94°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.32°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:06 ---
+누적 이상 감지 횟수: 54회
+Overall Average: 25.03°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.48°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:06 ---
+누적 이상 감지 횟수: 55회
+Overall Average: 25.04°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.41°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:06 ---
+누적 이상 감지 횟수: 56회
+Overall Average: 24.93°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.34°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:07 ---
+누적 이상 감지 횟수: 57회
+Overall Average: 24.91°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.41°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:07 ---
+누적 이상 감지 횟수: 58회
+Overall Average: 24.78°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.16°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:07 ---
+누적 이상 감지 횟수: 59회
+Overall Average: 24.99°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.37°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:08 ---
+누적 이상 감지 횟수: 60회
+Overall Average: 25.11°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.43°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:08 ---
+누적 이상 감지 횟수: 61회
+Overall Average: 25.22°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.64°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:08 ---
+누적 이상 감지 횟수: 62회
+Overall Average: 25.37°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.80°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:09 ---
+누적 이상 감지 횟수: 63회
+Overall Average: 25.27°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:09 ---
+누적 이상 감지 횟수: 64회
+Overall Average: 25.46°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:09 ---
+누적 이상 감지 횟수: 65회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:09 ---
+누적 이상 감지 횟수: 66회
+Overall Average: 25.50°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:10 ---
+누적 이상 감지 횟수: 67회
+Overall Average: 25.57°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.04°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:10 ---
+누적 이상 감지 횟수: 68회
+Overall Average: 25.65°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.14°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:10 ---
+누적 이상 감지 횟수: 69회
+Overall Average: 25.57°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.00°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:11 ---
+누적 이상 감지 횟수: 70회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.90°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:11 ---
+누적 이상 감지 횟수: 71회
+Overall Average: 25.53°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.88°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:11 ---
+누적 이상 감지 횟수: 72회
+Overall Average: 25.54°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.97°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:12 ---
+누적 이상 감지 횟수: 73회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.01°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:12 ---
+누적 이상 감지 횟수: 74회
+Overall Average: 25.38°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.88°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:12 ---
+누적 이상 감지 횟수: 75회
+Overall Average: 25.07°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.52°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:12 ---
+누적 이상 감지 횟수: 76회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.66°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:13 ---
+누적 이상 감지 횟수: 77회
+Overall Average: 25.31°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.66°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:13 ---
+누적 이상 감지 횟수: 78회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.69°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:13 ---
+누적 이상 감지 횟수: 79회
+Overall Average: 25.38°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.91°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:14 ---
+누적 이상 감지 횟수: 80회
+Overall Average: 25.24°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.65°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:14 ---
+누적 이상 감지 횟수: 81회
+Overall Average: 25.08°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.53°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:14 ---
+누적 이상 감지 횟수: 82회
+Overall Average: 24.93°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.38°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:14 ---
+누적 이상 감지 횟수: 83회
+Overall Average: 24.91°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.55°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:15 ---
+누적 이상 감지 횟수: 84회
+Overall Average: 24.99°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.62°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:15 ---
+누적 이상 감지 횟수: 85회
+Overall Average: 25.12°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:15 ---
+누적 이상 감지 횟수: 86회
+Overall Average: 25.28°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.82°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:16 ---
+누적 이상 감지 횟수: 87회
+Overall Average: 25.14°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.77°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:16 ---
+누적 이상 감지 횟수: 88회
+Overall Average: 25.40°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:16 ---
+누적 이상 감지 횟수: 89회
+Overall Average: 25.46°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.92°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:17 ---
+누적 이상 감지 횟수: 90회
+Overall Average: 25.41°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.94°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:17 ---
+누적 이상 감지 횟수: 91회
+Overall Average: 25.39°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.91°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:17 ---
+누적 이상 감지 횟수: 92회
+Overall Average: 25.31°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.67°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:17 ---
+누적 이상 감지 횟수: 93회
+Overall Average: 25.27°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:18 ---
+누적 이상 감지 횟수: 94회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.83°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:18 ---
+누적 이상 감지 횟수: 95회
+Overall Average: 25.22°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.63°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:19 ---
+누적 이상 감지 횟수: 96회
+Overall Average: 25.43°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.83°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:19 ---
+누적 이상 감지 횟수: 97회
+Overall Average: 25.41°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:19 ---
+누적 이상 감지 횟수: 98회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.00°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:19 ---
+누적 이상 감지 횟수: 99회
+Overall Average: 25.52°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.11°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:20 ---
+누적 이상 감지 횟수: 100회
+Overall Average: 25.41°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.73°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:20 ---
+누적 이상 감지 횟수: 101회
+Overall Average: 25.55°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.06°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:20 ---
+누적 이상 감지 횟수: 102회
+Overall Average: 25.58°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.10°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:21 ---
+누적 이상 감지 횟수: 103회
+Overall Average: 25.54°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.06°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:21 ---
+누적 이상 감지 횟수: 104회
+Overall Average: 25.61°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.09°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:21 ---
+누적 이상 감지 횟수: 105회
+Overall Average: 25.74°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.22°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:22 ---
+누적 이상 감지 횟수: 106회
+Overall Average: 25.63°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.13°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:22 ---
+누적 이상 감지 횟수: 107회
+Overall Average: 25.55°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:22 ---
+누적 이상 감지 횟수: 108회
+Overall Average: 25.66°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.10°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:22 ---
+누적 이상 감지 횟수: 109회
+Overall Average: 25.73°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.33°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:23 ---
+누적 이상 감지 횟수: 110회
+Overall Average: 25.77°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.30°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:23 ---
+누적 이상 감지 횟수: 111회
+Overall Average: 25.77°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.37°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:23 ---
+누적 이상 감지 횟수: 112회
+Overall Average: 25.54°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.13°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:24 ---
+누적 이상 감지 횟수: 113회
+Overall Average: 25.65°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.35°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:24 ---
+누적 이상 감지 횟수: 114회
+Overall Average: 25.59°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.27°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:24 ---
+누적 이상 감지 횟수: 115회
+Overall Average: 25.62°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.05°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:25 ---
+누적 이상 감지 횟수: 116회
+Overall Average: 25.62°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.22°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:25 ---
+누적 이상 감지 횟수: 117회
+Overall Average: 25.58°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.32°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:25 ---
+누적 이상 감지 횟수: 118회
+Overall Average: 25.61°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:25 ---
+누적 이상 감지 횟수: 119회
+Overall Average: 25.39°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.98°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:26 ---
+누적 이상 감지 횟수: 120회
+Overall Average: 25.55°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.17°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:26 ---
+누적 이상 감지 횟수: 121회
+Overall Average: 25.40°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.90°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:26 ---
+누적 이상 감지 횟수: 122회
+Overall Average: 25.35°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.97°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:27 ---
+누적 이상 감지 횟수: 123회
+Overall Average: 25.54°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.03°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:27 ---
+누적 이상 감지 횟수: 124회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:27 ---
+누적 이상 감지 횟수: 125회
+Overall Average: 25.74°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.34°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:28 ---
+누적 이상 감지 횟수: 126회
+Overall Average: 25.86°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.39°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:28 ---
+누적 이상 감지 횟수: 127회
+Overall Average: 25.94°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.39°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:28 ---
+누적 이상 감지 횟수: 128회
+Overall Average: 25.96°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.11°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:28 ---
+누적 이상 감지 횟수: 129회
+Overall Average: 25.93°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.00°C (기준 30.0°C 초과)
+- Position (6,5): 31.43°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:29 ---
+누적 이상 감지 횟수: 130회
+Overall Average: 25.93°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.04°C (기준 30.0°C 초과)
+- Position (6,5): 31.40°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:29 ---
+누적 이상 감지 횟수: 131회
+Overall Average: 25.68°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.14°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:29 ---
+누적 이상 감지 횟수: 132회
+Overall Average: 25.79°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.18°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:30 ---
+누적 이상 감지 횟수: 133회
+Overall Average: 25.76°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:30 ---
+누적 이상 감지 횟수: 134회
+Overall Average: 25.70°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.26°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:30 ---
+누적 이상 감지 횟수: 135회
+Overall Average: 25.57°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:31 ---
+누적 이상 감지 횟수: 136회
+Overall Average: 25.43°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:31 ---
+누적 이상 감지 횟수: 137회
+Overall Average: 25.60°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.19°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:31 ---
+누적 이상 감지 횟수: 138회
+Overall Average: 25.68°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.14°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:31 ---
+누적 이상 감지 횟수: 139회
+Overall Average: 25.55°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.15°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:32 ---
+누적 이상 감지 횟수: 140회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.08°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:32 ---
+누적 이상 감지 횟수: 141회
+Overall Average: 25.35°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.04°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:32 ---
+누적 이상 감지 횟수: 142회
+Overall Average: 25.39°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.12°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:33 ---
+누적 이상 감지 횟수: 143회
+Overall Average: 25.31°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:33 ---
+누적 이상 감지 횟수: 144회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.12°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:33 ---
+누적 이상 감지 횟수: 145회
+Overall Average: 25.47°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:34 ---
+누적 이상 감지 횟수: 146회
+Overall Average: 25.60°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.24°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:34 ---
+누적 이상 감지 횟수: 147회
+Overall Average: 25.53°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.98°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:34 ---
+누적 이상 감지 횟수: 148회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:34 ---
+누적 이상 감지 횟수: 149회
+Overall Average: 25.58°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.22°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:35 ---
+누적 이상 감지 횟수: 150회
+Overall Average: 25.55°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.23°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:35 ---
+누적 이상 감지 횟수: 151회
+Overall Average: 25.51°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.32°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:35 ---
+누적 이상 감지 횟수: 152회
+Overall Average: 25.39°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.03°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:36 ---
+누적 이상 감지 횟수: 153회
+Overall Average: 25.24°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.98°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:36 ---
+누적 이상 감지 횟수: 154회
+Overall Average: 25.52°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.21°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:36 ---
+누적 이상 감지 횟수: 155회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.82°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:37 ---
+누적 이상 감지 횟수: 156회
+Overall Average: 25.16°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:37 ---
+누적 이상 감지 횟수: 157회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.92°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:37 ---
+누적 이상 감지 횟수: 158회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.68°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:37 ---
+누적 이상 감지 횟수: 159회
+Overall Average: 25.31°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.98°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:38 ---
+누적 이상 감지 횟수: 160회
+Overall Average: 25.16°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.92°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:38 ---
+누적 이상 감지 횟수: 161회
+Overall Average: 25.36°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:38 ---
+누적 이상 감지 횟수: 162회
+Overall Average: 25.36°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.90°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:39 ---
+누적 이상 감지 횟수: 163회
+Overall Average: 25.37°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.98°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:39 ---
+누적 이상 감지 횟수: 164회
+Overall Average: 25.37°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.98°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:39 ---
+누적 이상 감지 횟수: 165회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.85°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:40 ---
+누적 이상 감지 횟수: 166회
+Overall Average: 25.39°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.11°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:40 ---
+누적 이상 감지 횟수: 167회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:40 ---
+누적 이상 감지 횟수: 168회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.13°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:40 ---
+누적 이상 감지 횟수: 169회
+Overall Average: 25.09°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.88°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:41 ---
+누적 이상 감지 횟수: 170회
+Overall Average: 25.11°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.94°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:41 ---
+누적 이상 감지 횟수: 171회
+Overall Average: 25.16°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.75°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:41 ---
+누적 이상 감지 횟수: 172회
+Overall Average: 25.05°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.90°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:42 ---
+누적 이상 감지 횟수: 173회
+Overall Average: 25.33°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.03°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:42 ---
+누적 이상 감지 횟수: 174회
+Overall Average: 25.51°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.15°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:42 ---
+누적 이상 감지 횟수: 175회
+Overall Average: 25.59°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.29°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:43 ---
+누적 이상 감지 횟수: 176회
+Overall Average: 25.62°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.39°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:43 ---
+누적 이상 감지 횟수: 177회
+Overall Average: 25.52°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.08°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:43 ---
+누적 이상 감지 횟수: 178회
+Overall Average: 25.72°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.39°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:43 ---
+누적 이상 감지 횟수: 179회
+Overall Average: 25.68°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.31°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:44 ---
+누적 이상 감지 횟수: 180회
+Overall Average: 25.66°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.44°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:44 ---
+누적 이상 감지 횟수: 181회
+Overall Average: 25.61°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.30°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:44 ---
+누적 이상 감지 횟수: 182회
+Overall Average: 25.66°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.32°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:45 ---
+누적 이상 감지 횟수: 183회
+Overall Average: 25.66°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:45 ---
+누적 이상 감지 횟수: 184회
+Overall Average: 25.47°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.21°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:45 ---
+누적 이상 감지 횟수: 185회
+Overall Average: 25.70°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.35°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:46 ---
+누적 이상 감지 횟수: 186회
+Overall Average: 25.56°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.15°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:46 ---
+누적 이상 감지 횟수: 187회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.01°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:46 ---
+누적 이상 감지 횟수: 188회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.15°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:46 ---
+누적 이상 감지 횟수: 189회
+Overall Average: 25.09°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.66°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:47 ---
+누적 이상 감지 횟수: 190회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:47 ---
+누적 이상 감지 횟수: 191회
+Overall Average: 25.11°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:47 ---
+누적 이상 감지 횟수: 192회
+Overall Average: 25.19°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:48 ---
+누적 이상 감지 횟수: 193회
+Overall Average: 25.24°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.79°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:48 ---
+누적 이상 감지 횟수: 194회
+Overall Average: 25.19°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.85°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:48 ---
+누적 이상 감지 횟수: 195회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.77°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:49 ---
+누적 이상 감지 횟수: 196회
+Overall Average: 25.13°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.68°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:49 ---
+누적 이상 감지 횟수: 197회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:49 ---
+누적 이상 감지 횟수: 198회
+Overall Average: 25.32°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:49 ---
+누적 이상 감지 횟수: 199회
+Overall Average: 25.30°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.02°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:50 ---
+누적 이상 감지 횟수: 200회
+Overall Average: 25.46°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.01°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:50 ---
+누적 이상 감지 횟수: 201회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:50 ---
+누적 이상 감지 횟수: 202회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.88°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:51 ---
+누적 이상 감지 횟수: 203회
+Overall Average: 25.21°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.77°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:51 ---
+누적 이상 감지 횟수: 204회
+Overall Average: 25.28°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.82°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:51 ---
+누적 이상 감지 횟수: 205회
+Overall Average: 25.19°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.76°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:52 ---
+누적 이상 감지 횟수: 206회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.70°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:52 ---
+누적 이상 감지 횟수: 207회
+Overall Average: 25.10°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.76°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:52 ---
+누적 이상 감지 횟수: 208회
+Overall Average: 24.95°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.65°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:52 ---
+누적 이상 감지 횟수: 209회
+Overall Average: 25.15°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.83°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:53 ---
+누적 이상 감지 횟수: 210회
+Overall Average: 25.14°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.82°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:53 ---
+누적 이상 감지 횟수: 211회
+Overall Average: 24.94°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:53 ---
+누적 이상 감지 횟수: 212회
+Overall Average: 24.99°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.58°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:54 ---
+누적 이상 감지 횟수: 213회
+Overall Average: 24.65°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.31°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:54 ---
+누적 이상 감지 횟수: 214회
+Overall Average: 24.90°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.58°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:54 ---
+누적 이상 감지 횟수: 215회
+Overall Average: 24.97°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.68°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:55 ---
+누적 이상 감지 횟수: 216회
+Overall Average: 24.90°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.65°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:55 ---
+누적 이상 감지 횟수: 217회
+Overall Average: 25.02°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.76°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:55 ---
+누적 이상 감지 횟수: 218회
+Overall Average: 24.88°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.53°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:55 ---
+누적 이상 감지 횟수: 219회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.78°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:56 ---
+누적 이상 감지 횟수: 220회
+Overall Average: 25.09°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.92°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:56 ---
+누적 이상 감지 횟수: 221회
+Overall Average: 25.38°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.99°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:56 ---
+누적 이상 감지 횟수: 222회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.16°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:57 ---
+누적 이상 감지 횟수: 223회
+Overall Average: 25.60°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.35°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:57 ---
+누적 이상 감지 횟수: 224회
+Overall Average: 25.61°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.29°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:57 ---
+누적 이상 감지 횟수: 225회
+Overall Average: 25.51°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.31°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:58 ---
+누적 이상 감지 횟수: 226회
+Overall Average: 25.72°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:58 ---
+누적 이상 감지 횟수: 227회
+Overall Average: 25.85°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.10°C (기준 30.0°C 초과)
+- Position (6,5): 31.74°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:58 ---
+누적 이상 감지 횟수: 228회
+Overall Average: 25.79°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.02°C (기준 30.0°C 초과)
+- Position (6,5): 31.54°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:58 ---
+누적 이상 감지 횟수: 229회
+Overall Average: 25.78°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.63°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:59 ---
+누적 이상 감지 횟수: 230회
+Overall Average: 25.64°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.09°C (기준 30.0°C 초과)
+- Position (6,5): 31.40°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:59 ---
+누적 이상 감지 횟수: 231회
+Overall Average: 25.82°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.13°C (기준 30.0°C 초과)
+- Position (6,5): 31.44°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:27:59 ---
+누적 이상 감지 횟수: 232회
+Overall Average: 25.65°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.35°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:00 ---
+누적 이상 감지 횟수: 233회
+Overall Average: 25.76°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.03°C (기준 30.0°C 초과)
+- Position (6,5): 31.46°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:00 ---
+누적 이상 감지 횟수: 234회
+Overall Average: 25.75°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.53°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:00 ---
+누적 이상 감지 횟수: 235회
+Overall Average: 25.66°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.41°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:01 ---
+누적 이상 감지 횟수: 236회
+Overall Average: 25.74°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.37°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:01 ---
+누적 이상 감지 횟수: 237회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.07°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:01 ---
+누적 이상 감지 횟수: 238회
+Overall Average: 25.55°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.05°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:01 ---
+누적 이상 감지 횟수: 239회
+Overall Average: 25.37°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.97°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:02 ---
+누적 이상 감지 횟수: 240회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:02 ---
+누적 이상 감지 횟수: 241회
+Overall Average: 25.07°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.84°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:02 ---
+누적 이상 감지 횟수: 242회
+Overall Average: 24.92°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.49°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:03 ---
+누적 이상 감지 횟수: 243회
+Overall Average: 25.19°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.94°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:03 ---
+누적 이상 감지 횟수: 244회
+Overall Average: 24.95°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.64°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:03 ---
+누적 이상 감지 횟수: 245회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.97°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:04 ---
+누적 이상 감지 횟수: 246회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.76°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:04 ---
+누적 이상 감지 횟수: 247회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.71°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:04 ---
+누적 이상 감지 횟수: 248회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.91°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:04 ---
+누적 이상 감지 횟수: 249회
+Overall Average: 25.09°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:05 ---
+누적 이상 감지 횟수: 250회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:05 ---
+누적 이상 감지 횟수: 251회
+Overall Average: 25.32°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.97°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:05 ---
+누적 이상 감지 횟수: 252회
+Overall Average: 25.24°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:06 ---
+누적 이상 감지 횟수: 253회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.85°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:06 ---
+누적 이상 감지 횟수: 254회
+Overall Average: 25.03°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.83°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:06 ---
+누적 이상 감지 횟수: 255회
+Overall Average: 25.24°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:06 ---
+누적 이상 감지 횟수: 256회
+Overall Average: 25.31°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.04°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:07 ---
+누적 이상 감지 횟수: 257회
+Overall Average: 25.21°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:07 ---
+누적 이상 감지 횟수: 258회
+Overall Average: 25.34°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.00°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:07 ---
+누적 이상 감지 횟수: 259회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.85°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:08 ---
+누적 이상 감지 횟수: 260회
+Overall Average: 25.33°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.07°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:08 ---
+누적 이상 감지 횟수: 261회
+Overall Average: 25.08°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.82°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:08 ---
+누적 이상 감지 횟수: 262회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.90°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:09 ---
+누적 이상 감지 횟수: 263회
+Overall Average: 25.22°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.09°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:09 ---
+누적 이상 감지 횟수: 264회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.97°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:09 ---
+누적 이상 감지 횟수: 265회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.02°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:10 ---
+누적 이상 감지 횟수: 266회
+Overall Average: 25.05°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.63°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:10 ---
+누적 이상 감지 횟수: 267회
+Overall Average: 25.21°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.06°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:10 ---
+누적 이상 감지 횟수: 268회
+Overall Average: 25.37°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.12°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:10 ---
+누적 이상 감지 횟수: 269회
+Overall Average: 25.30°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.10°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:11 ---
+누적 이상 감지 횟수: 270회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.87°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:11 ---
+누적 이상 감지 횟수: 271회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.99°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:11 ---
+누적 이상 감지 횟수: 272회
+Overall Average: 25.27°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.09°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:12 ---
+누적 이상 감지 횟수: 273회
+Overall Average: 25.17°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.86°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:12 ---
+누적 이상 감지 횟수: 274회
+Overall Average: 25.26°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.02°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:12 ---
+누적 이상 감지 횟수: 275회
+Overall Average: 25.32°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:13 ---
+누적 이상 감지 횟수: 276회
+Overall Average: 25.17°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.88°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:13 ---
+누적 이상 감지 횟수: 277회
+Overall Average: 25.07°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.69°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:13 ---
+누적 이상 감지 횟수: 278회
+Overall Average: 24.80°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.43°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:13 ---
+누적 이상 감지 횟수: 279회
+Overall Average: 24.87°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.64°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:14 ---
+누적 이상 감지 횟수: 280회
+Overall Average: 24.89°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.80°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:14 ---
+누적 이상 감지 횟수: 281회
+Overall Average: 24.84°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.34°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:14 ---
+누적 이상 감지 횟수: 282회
+Overall Average: 24.87°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:15 ---
+누적 이상 감지 횟수: 283회
+Overall Average: 24.92°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.55°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:15 ---
+누적 이상 감지 횟수: 284회
+Overall Average: 25.09°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.87°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:15 ---
+누적 이상 감지 횟수: 285회
+Overall Average: 24.97°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.76°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:15 ---
+누적 이상 감지 횟수: 286회
+Overall Average: 25.29°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.16°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:16 ---
+누적 이상 감지 횟수: 287회
+Overall Average: 25.36°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.19°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:16 ---
+누적 이상 감지 횟수: 288회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.14°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:16 ---
+누적 이상 감지 횟수: 289회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.43°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:17 ---
+누적 이상 감지 횟수: 290회
+Overall Average: 25.34°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.18°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:17 ---
+누적 이상 감지 횟수: 291회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.41°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:17 ---
+누적 이상 감지 횟수: 292회
+Overall Average: 25.33°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.09°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:18 ---
+누적 이상 감지 횟수: 293회
+Overall Average: 25.56°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.49°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:18 ---
+누적 이상 감지 횟수: 294회
+Overall Average: 25.52°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.33°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:18 ---
+누적 이상 감지 횟수: 295회
+Overall Average: 25.33°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.21°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:18 ---
+누적 이상 감지 횟수: 296회
+Overall Average: 25.39°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.17°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:19 ---
+누적 이상 감지 횟수: 297회
+Overall Average: 25.29°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.95°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:19 ---
+누적 이상 감지 횟수: 298회
+Overall Average: 25.43°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.31°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:19 ---
+누적 이상 감지 횟수: 299회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.26°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:20 ---
+누적 이상 감지 횟수: 300회
+Overall Average: 25.30°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.07°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:20 ---
+누적 이상 감지 횟수: 301회
+Overall Average: 25.16°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.99°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:20 ---
+누적 이상 감지 횟수: 302회
+Overall Average: 24.93°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.80°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:21 ---
+누적 이상 감지 횟수: 303회
+Overall Average: 25.01°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.89°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:21 ---
+누적 이상 감지 횟수: 304회
+Overall Average: 25.05°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.87°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:21 ---
+누적 이상 감지 횟수: 305회
+Overall Average: 24.95°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.81°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:21 ---
+누적 이상 감지 횟수: 306회
+Overall Average: 24.98°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.84°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:22 ---
+누적 이상 감지 횟수: 307회
+Overall Average: 24.77°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.67°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:22 ---
+누적 이상 감지 횟수: 308회
+Overall Average: 24.86°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.67°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:22 ---
+누적 이상 감지 횟수: 309회
+Overall Average: 24.68°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.57°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:23 ---
+누적 이상 감지 횟수: 310회
+Overall Average: 24.57°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.57°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:23 ---
+누적 이상 감지 횟수: 311회
+Overall Average: 24.83°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.73°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:23 ---
+누적 이상 감지 횟수: 312회
+Overall Average: 25.11°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.02°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:24 ---
+누적 이상 감지 횟수: 313회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:24 ---
+누적 이상 감지 횟수: 314회
+Overall Average: 25.50°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.38°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:24 ---
+누적 이상 감지 횟수: 315회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.28°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:25 ---
+누적 이상 감지 횟수: 316회
+Overall Average: 25.59°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.38°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:25 ---
+누적 이상 감지 횟수: 317회
+Overall Average: 25.69°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.50°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:25 ---
+누적 이상 감지 횟수: 318회
+Overall Average: 25.66°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.05°C (기준 30.0°C 초과)
+- Position (6,5): 31.48°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:26 ---
+누적 이상 감지 횟수: 319회
+Overall Average: 25.72°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.25°C (기준 30.0°C 초과)
+- Position (6,5): 31.67°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:26 ---
+누적 이상 감지 횟수: 320회
+Overall Average: 25.71°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.05°C (기준 30.0°C 초과)
+- Position (6,5): 31.52°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:26 ---
+누적 이상 감지 횟수: 321회
+Overall Average: 25.73°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.01°C (기준 30.0°C 초과)
+- Position (6,5): 31.50°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:26 ---
+누적 이상 감지 횟수: 322회
+Overall Average: 25.63°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.42°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:27 ---
+누적 이상 감지 횟수: 323회
+Overall Average: 25.82°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.23°C (기준 30.0°C 초과)
+- Position (6,5): 31.59°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:27 ---
+누적 이상 감지 횟수: 324회
+Overall Average: 25.84°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.16°C (기준 30.0°C 초과)
+- Position (6,5): 31.69°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:27 ---
+누적 이상 감지 횟수: 325회
+Overall Average: 25.84°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.10°C (기준 30.0°C 초과)
+- Position (6,5): 31.50°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:28 ---
+누적 이상 감지 횟수: 326회
+Overall Average: 25.86°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.15°C (기준 30.0°C 초과)
+- Position (6,5): 31.59°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:28 ---
+누적 이상 감지 횟수: 327회
+Overall Average: 25.62°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.08°C (기준 30.0°C 초과)
+- Position (6,5): 31.57°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:28 ---
+누적 이상 감지 횟수: 328회
+Overall Average: 25.80°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.19°C (기준 30.0°C 초과)
+- Position (6,5): 31.58°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:29 ---
+누적 이상 감지 횟수: 329회
+Overall Average: 25.78°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.18°C (기준 30.0°C 초과)
+- Position (6,5): 31.60°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:29 ---
+누적 이상 감지 횟수: 330회
+Overall Average: 25.77°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.11°C (기준 30.0°C 초과)
+- Position (6,5): 31.46°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:29 ---
+누적 이상 감지 횟수: 331회
+Overall Average: 25.77°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.15°C (기준 30.0°C 초과)
+- Position (6,5): 31.58°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:29 ---
+누적 이상 감지 횟수: 332회
+Overall Average: 25.59°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.02°C (기준 30.0°C 초과)
+- Position (6,5): 31.45°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:30 ---
+누적 이상 감지 횟수: 333회
+Overall Average: 25.71°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:30 ---
+누적 이상 감지 횟수: 334회
+Overall Average: 25.54°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.24°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:30 ---
+누적 이상 감지 횟수: 335회
+Overall Average: 25.65°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.19°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:31 ---
+누적 이상 감지 횟수: 336회
+Overall Average: 25.53°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.27°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:31 ---
+누적 이상 감지 횟수: 337회
+Overall Average: 25.56°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.01°C (기준 30.0°C 초과)
+- Position (6,5): 31.44°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:31 ---
+누적 이상 감지 횟수: 338회
+Overall Average: 25.42°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.27°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:32 ---
+누적 이상 감지 횟수: 339회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.93°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:32 ---
+누적 이상 감지 횟수: 340회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.30°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:32 ---
+누적 이상 감지 횟수: 341회
+Overall Average: 25.49°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.02°C (기준 30.0°C 초과)
+- Position (6,5): 31.40°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:32 ---
+누적 이상 감지 횟수: 342회
+Overall Average: 25.45°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.28°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:33 ---
+누적 이상 감지 횟수: 343회
+Overall Average: 25.49°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.36°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:33 ---
+누적 이상 감지 횟수: 344회
+Overall Average: 25.20°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.06°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:33 ---
+누적 이상 감지 횟수: 345회
+Overall Average: 25.32°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.30°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:34 ---
+누적 이상 감지 횟수: 346회
+Overall Average: 25.18°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.04°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:34 ---
+누적 이상 감지 횟수: 347회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.23°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:34 ---
+누적 이상 감지 횟수: 348회
+Overall Average: 25.23°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.86°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:35 ---
+누적 이상 감지 횟수: 349회
+Overall Average: 25.03°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:35 ---
+누적 이상 감지 횟수: 350회
+Overall Average: 24.90°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.80°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:35 ---
+누적 이상 감지 횟수: 351회
+Overall Average: 24.74°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.61°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:35 ---
+누적 이상 감지 횟수: 352회
+Overall Average: 24.87°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.66°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:36 ---
+누적 이상 감지 횟수: 353회
+Overall Average: 24.70°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.45°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:36 ---
+누적 이상 감지 횟수: 354회
+Overall Average: 24.64°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.45°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:36 ---
+누적 이상 감지 횟수: 355회
+Overall Average: 24.64°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.68°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:37 ---
+누적 이상 감지 횟수: 356회
+Overall Average: 24.73°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.82°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:37 ---
+누적 이상 감지 횟수: 357회
+Overall Average: 24.95°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.91°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:37 ---
+누적 이상 감지 횟수: 358회
+Overall Average: 24.85°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.79°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:38 ---
+누적 이상 감지 횟수: 359회
+Overall Average: 25.15°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.08°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:38 ---
+누적 이상 감지 횟수: 360회
+Overall Average: 25.28°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.13°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:38 ---
+누적 이상 감지 횟수: 361회
+Overall Average: 25.48°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.44°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:38 ---
+누적 이상 감지 횟수: 362회
+Overall Average: 25.60°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.51°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:39 ---
+누적 이상 감지 횟수: 363회
+Overall Average: 25.44°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.47°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:39 ---
+누적 이상 감지 횟수: 364회
+Overall Average: 25.68°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.07°C (기준 30.0°C 초과)
+- Position (6,5): 31.65°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:39 ---
+누적 이상 감지 횟수: 365회
+Overall Average: 25.74°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.16°C (기준 30.0°C 초과)
+- Position (6,5): 31.72°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:40 ---
+누적 이상 감지 횟수: 366회
+Overall Average: 25.83°C
+Detection Limit: 30.0°C
+- Position (6,5): 31.78°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:40 ---
+누적 이상 감지 횟수: 367회
+Overall Average: 25.98°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.42°C (기준 30.0°C 초과)
+- Position (6,5): 32.00°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:40 ---
+누적 이상 감지 횟수: 368회
+Overall Average: 25.91°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.32°C (기준 30.0°C 초과)
+- Position (6,5): 32.24°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:41 ---
+누적 이상 감지 횟수: 369회
+Overall Average: 26.20°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.65°C (기준 30.0°C 초과)
+- Position (6,5): 32.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:41 ---
+누적 이상 감지 횟수: 370회
+Overall Average: 26.18°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.55°C (기준 30.0°C 초과)
+- Position (6,5): 32.25°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:41 ---
+누적 이상 감지 횟수: 371회
+Overall Average: 26.07°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.60°C (기준 30.0°C 초과)
+- Position (6,5): 32.27°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:41 ---
+누적 이상 감지 횟수: 372회
+Overall Average: 26.02°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.43°C (기준 30.0°C 초과)
+- Position (6,5): 32.21°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:42 ---
+누적 이상 감지 횟수: 373회
+Overall Average: 25.95°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.63°C (기준 30.0°C 초과)
+- Position (6,5): 32.28°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:42 ---
+누적 이상 감지 횟수: 374회
+Overall Average: 25.90°C
+Detection Limit: 30.0°C
+- Position (5,5): 30.86°C (기준 30.0°C 초과)
+- Position (6,5): 32.39°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:46 ---
+누적 이상 감지 횟수: 375회
+Overall Average: 25.30°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.70°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:47 ---
+누적 이상 감지 횟수: 376회
+Overall Average: 25.37°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.60°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:47 ---
+누적 이상 감지 횟수: 377회
+Overall Average: 25.25°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.31°C (기준 30.0°C 초과)
+
+--- Detected at 2025-07-31 09:28:47 ---
+누적 이상 감지 횟수: 378회
+Overall Average: 25.21°C
+Detection Limit: 30.0°C
+- Position (6,5): 30.23°C (기준 30.0°C 초과)
+
+--- Detected at 11:42:05 ---
+누적 이상 감지 횟수: 1회
+Overall Average: 25.71°C
+- Index 36: 44.63
+
+--- Detected at 11:42:08 ---
+누적 이상 감지 횟수: 2회
+Overall Average: 25.22°C
+- Index 4: 40.00
+
+--- Detected at 11:42:09 ---
+누적 이상 감지 횟수: 3회
+Overall Average: 25.54°C
+- Index 31: 39.90
+
+--- Detected at 11:42:11 ---
+누적 이상 감지 횟수: 4회
+Overall Average: 25.57°C
+- Index 11: 44.18
+
+--- Detected at 11:42:14 ---
+누적 이상 감지 횟수: 5회
+Overall Average: 25.47°C
+- Index 14: 44.81
+
+--- Detected at 11:42:19 ---
+누적 이상 감지 횟수: 6회
+Overall Average: 25.02°C
+- Index 7: 42.07
+
+--- Detected at 11:42:22 ---
+누적 이상 감지 횟수: 7회
+Overall Average: 25.15°C
+- Index 17: 41.85
+
+--- Detected at 11:42:24 ---
+누적 이상 감지 횟수: 8회
+Overall Average: 25.47°C
+- Index 61: 40.22
+
+--- Detected at 11:42:26 ---
+누적 이상 감지 횟수: 9회
+Overall Average: 25.35°C
+- Index 7: 37.18
+
+--- Detected at 11:42:35 ---
+누적 이상 감지 횟수: 10회
+Overall Average: 25.33°C
+- Index 20: 44.38
+
+--- Detected at 11:42:43 ---
+누적 이상 감지 횟수: 11회
+Overall Average: 25.38°C
+- Index 27: 37.05
+
+--- Detected at 11:42:46 ---
+누적 이상 감지 횟수: 12회
+Overall Average: 24.43°C
+- Index 11: 39.10
+
+--- Detected at 11:42:52 ---
+누적 이상 감지 횟수: 13회
+Overall Average: 25.06°C
+- Index 2: 40.02
+
+--- Detected at 11:42:56 ---
+누적 이상 감지 횟수: 14회
+Overall Average: 25.61°C
+- Index 46: 35.83
+
+--- Detected at 11:42:57 ---
+누적 이상 감지 횟수: 15회
+Overall Average: 25.29°C
+- Index 46: 42.63
+
+--- Detected at 11:43:01 ---
+누적 이상 감지 횟수: 16회
+Overall Average: 24.82°C
+- Index 37: 37.89
+
+--- Detected at 11:43:02 ---
+누적 이상 감지 횟수: 17회
+Overall Average: 25.04°C
+- Index 38: 39.62
+
+--- Detected at 11:43:07 ---
+누적 이상 감지 횟수: 1회
+Overall Average: 25.11°C
+- Index 25: 41.50
+
+--- Detected at 11:43:14 ---
+누적 이상 감지 횟수: 2회
+Overall Average: 24.89°C
+- Index 7: 42.81
+
+--- Detected at 11:43:16 ---
+누적 이상 감지 횟수: 3회
+Overall Average: 25.51°C
+- Index 21: 35.89
+
+--- Detected at 11:43:22 ---
+누적 이상 감지 횟수: 4회
+Overall Average: 25.06°C
+- Index 14: 35.15
+
+--- Detected at 11:43:27 ---
+누적 이상 감지 횟수: 5회
+Overall Average: 25.38°C
+- Index 39: 40.41
+
+--- Detected at 11:43:29 ---
+누적 이상 감지 횟수: 6회
+Overall Average: 24.94°C
+- Index 3: 44.58
+
+--- Detected at 11:44:17 ---
+누적 이상 감지 횟수: 1회
+Overall Average: 25.13°C
+- Index 41: 37.43
+
+--- Detected at 11:44:19 ---
+누적 이상 감지 횟수: 2회
+Overall Average: 25.37°C
+- Index 60: 36.80
+
+--- Detected at 11:44:24 ---
+누적 이상 감지 횟수: 3회
+Overall Average: 25.45°C
+- Index 50: 42.55
+
+--- Detected at 11:44:27 ---
+누적 이상 감지 횟수: 4회
+Overall Average: 25.28°C
+- Index 57: 43.74
+
+--- Detected at 11:44:29 ---
+누적 이상 감지 횟수: 5회
+Overall Average: 24.65°C
+- Index 55: 35.52
+
+--- Detected at 11:44:33 ---
+누적 이상 감지 횟수: 6회
+Overall Average: 25.56°C
+- Index 18: 42.84
+
+--- Detected at 11:44:44 ---
+누적 이상 감지 횟수: 7회
+Overall Average: 25.23°C
+- Index 11: 35.98
+
+--- Detected at 11:44:49 ---
+누적 이상 감지 횟수: 8회
+Overall Average: 25.31°C
+- Index 21: 43.73
+
+--- Detected at 11:44:58 ---
+누적 이상 감지 횟수: 9회
+Overall Average: 24.71°C
+- Index 0: 35.49
+
+--- Detected at 11:44:59 ---
+누적 이상 감지 횟수: 10회
+Overall Average: 25.59°C
+- Index 47: 38.30
+
+--- Detected at 11:45:03 ---
+누적 이상 감지 횟수: 11회
+Overall Average: 24.91°C
+- Index 47: 41.97
+
+--- Detected at 11:45:10 ---
+누적 이상 감지 횟수: 12회
+Overall Average: 25.20°C
+- Index 24: 38.57
+
+--- Detected at 11:45:14 ---
+누적 이상 감지 횟수: 13회
+Overall Average: 25.24°C
+- Index 38: 36.35
+
+--- Detected at 11:45:19 ---
+누적 이상 감지 횟수: 14회
+Overall Average: 25.01°C
+- Index 1: 39.37
+
+--- Detected at 11:45:21 ---
+누적 이상 감지 횟수: 15회
+Overall Average: 25.36°C
+- Index 44: 44.71
+
+--- Detected at 11:45:28 ---
+누적 이상 감지 횟수: 16회
+Overall Average: 25.34°C
+- Index 34: 43.38
+
+--- Detected at 11:45:51 ---
+누적 이상 감지 횟수: 17회
+Overall Average: 24.84°C
+- Index 55: 40.72
+
+--- Detected at 11:45:53 ---
+누적 이상 감지 횟수: 18회
+Overall Average: 25.18°C
+- Index 30: 36.42
+
+--- Detected at 11:45:55 ---
+누적 이상 감지 횟수: 19회
+Overall Average: 25.69°C
+- Index 4: 40.62
+
+--- Detected at 11:45:57 ---
+누적 이상 감지 횟수: 20회
+Overall Average: 25.25°C
+- Index 39: 37.21
+
+--- Detected at 11:45:58 ---
+누적 이상 감지 횟수: 21회
+Overall Average: 25.10°C
+- Index 14: 41.64
+
+--- Detected at 11:46:07 ---
+누적 이상 감지 횟수: 22회
+Overall Average: 25.03°C
+- Index 16: 36.57
+
+--- Detected at 11:46:09 ---
+누적 이상 감지 횟수: 23회
+Overall Average: 25.40°C
+- Index 0: 44.65
+
+--- Detected at 11:46:11 ---
+누적 이상 감지 횟수: 24회
+Overall Average: 25.18°C
+- Index 51: 44.92
+
+--- Detected at 11:46:15 ---
+누적 이상 감지 횟수: 25회
+Overall Average: 25.20°C
+- Index 9: 36.10
+
+--- Detected at 11:46:18 ---
+누적 이상 감지 횟수: 26회
+Overall Average: 25.41°C
+- Index 49: 39.27
+
+--- Detected at 11:46:19 ---
+누적 이상 감지 횟수: 27회
+Overall Average: 25.41°C
+- Index 8: 43.87
+

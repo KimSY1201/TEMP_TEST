@@ -1,4 +1,10 @@
 build/
 dist/
 
+#실험용
+temp_app_test/
+
+# 보존용
+_temp_app_0731/
+temp_app2/
 main.spec
