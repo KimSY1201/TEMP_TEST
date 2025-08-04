@@ -1,3 +1,8 @@
+
+""" 
+250804 세이브
+
+"""
 import sys
 import os
 import subprocess
@@ -194,67 +199,7 @@ class DraggableNumberLabel(QLabel):
             self.unsetCursor()
         super().mouseReleaseEvent(event)
 
-# [추가] 누락되었던 DetectionModule 클래스 정의
-# ===================================================================
-# class DetectionModule(QThread):
-#     def __init__(self, detection_queue, data_signal, base_temperature=25.0, threshold=5.0, filename="detected_values.txt"):
-#         super().__init__()
-#         self.detection_queue = detection_queue
-#         self.data_signal = data_signal
-#         self.base_temperature = base_temperature
-#         self.threshold = threshold
-#         self.filename = filename
-#         self.running = True
-#         self.anomaly_total_count = 0
-#         self.weight_list = []
-        
-        
-#     def run(self):
-#         while self.running:
-#             try:
-#                 data_package = self.detection_queue.get(timeout=0.1)
 
-#                 if 'values' in data_package and 'time' in data_package:
-#                     current_time = data_package['time']
-#                     values = data_package['values']
-
-#                     if len(values) == 64:
-#                         self.process_values(current_time, values)
-#                     else:
-#                         print(f"DetectionModule: Expected 64 values, got {len(values)}. Skipping processing.")
-#                 else:
-#                     print(f"DetectionModule: Received invalid data_package. Keys 'values' or 'time' missing.")
-#             except queue.Empty:
-#                 continue
-
-#     def process_values(self, current_time, values):
-#         return
-#         # values_array = np.array(values)
-#         # average = np.mean(values_array)
-#         # detection_limit = self.base_temperature + self.threshold
-        
-#         # detected_high_values = [f"Index {i}: {val:.2f}" for i, val in enumerate(values_array) if val > detection_limit]
-        
-#         # if detected_high_values:
-#         #     self.anomaly_total_count += 1
-#         #     self.data_signal.anomaly_detected_signal.emit(self.anomaly_total_count)
-
-#         #     with open(self.filename, 'a', encoding='utf-8') as f:
-#         #         f.write(f"--- Detected at {current_time} ---\n")
-#         #         f.write(f"누적 이상 감지 횟수: {self.anomaly_total_count}회\n")
-#         #         f.write(f"Overall Average: {average:.2f}°C\n")
-#         #         for item in detected_high_values:
-#         #             f.write(f"- {item}\n")
-#         #         f.write("\n")
-                
-#         #     print(f"Detected high values at {current_time}. Total detections: {self.anomaly_total_count}. Saved to {self.filename}")
-#         # else:
-#         #     pass
-
-#     def stop(self):
-#         self.running = False
-#         self.wait()
-        
 class OutputModule(QWidget):
     ORIGINAL_GRID_SIZE = 8 # 원본 데이터 그리드 크기 (고정)
     DEFAULT_INTERPOLATED_GRID_SIZE = 8 # 초기 보간된 그리드 크기
@@ -340,8 +285,6 @@ class OutputModule(QWidget):
         smoke_layout, self.smoke_indicator = self._create_status_row("연기 감지")
         
         self.object_detection_label = QLabel("객체: N/A")
-        self.object_detection_label = QLabel("객체: N/A")
-        self.object_detection_label.setProperty("class", "TitleLabel")
         self.object_detection_label.setProperty("class", "TitleLabel")
         
         self.test_label = QLabel("test: N/A")
@@ -543,31 +486,6 @@ class OutputModule(QWidget):
             self.update_heatmap(self.current_data_package.get('values', []))
             self.showMaximized() # 현재 윈도우를 최대화합니다.
 
-    # def _create_heatmap_cells(self):
-    #     # 기존 셀들을 모두 제거
-    #     if self.grid_cells:
-    #         for row in self.grid_cells:
-    #             for cell in row:
-    #                 self.heatmap_layout.removeWidget(cell)
-    #                 cell.deleteLater()
-
-    #     self.grid_cells = []
-    #     # 현재 화면 높이에 맞춰 셀 크기 재계산
-    #     self.cell_size = self.max_height // self.interpolated_grid_size
-    #     self.font_siz = self.font_size = self.cell_size//3
-    #     for i in range(self.interpolated_grid_size):
-    #         row_cells = []
-    #         for j in range(self.interpolated_grid_size):
-    #             cell = QLabel()
-    #             cell.setFixedSize(self.cell_size, self.cell_size)
-    #             cell.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    #             cell.setProperty("class", "HeatmapCell")
-    #             cell.setStyleSheet(f"background-color: lightgray; font-size: {self.font_size}px")
-    #             # print(f"font-size: {self.font_size}px")
-    #             self.heatmap_layout.addWidget(cell, i, j)
-    #             row_cells.append(cell)
-    #         self.grid_cells.append(row_cells)
-    #     self.heatmap_layout.setRowStretch(-1,1)
     def _create_heatmap_cells(self):
         # 기존 셀들을 모두 제거
         if self.grid_cells:
