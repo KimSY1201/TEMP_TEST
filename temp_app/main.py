@@ -4,8 +4,8 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer
 
 # 리팩토링된 모듈들 import
-from detector import DetectionModule
-from gui import OutputModule, DataSignal, GLOBAL_STYLESHEET
+from TEMP_TEST.temp_app.detector_1 import DetectionModule
+from TEMP_TEST.temp_app.gui_1 import OutputModule, DataSignal, GLOBAL_STYLESHEET
 from receiver import ReceiverModule
 
 

@@ -31,7 +31,7 @@ class ReceiverModule(threading.Thread):
         except Exception as e: # 예상치 못한 예외 처리
             print(f"ReceiverModule: 시리얼 포트 초기화 중 오류 발생: {e}")
             self.running = False
-            return
+            return  
 
         while self.running:
             try:

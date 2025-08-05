@@ -72,7 +72,7 @@ class DetectionModule(threading.Thread):
         self.buffer_counter = 0
         self.high_temp_counter_init = 0
         
-        # data_signal_obj.parameter_update_signal.connect(self.update_detection_parameters)
+        data_signal_obj.parameter_update_signal.connect(self.update_detection_parameters)
         
         # 모델 로드 시도
         self.model = {}
@@ -183,7 +183,7 @@ class DetectionModule(threading.Thread):
         smoke_detected = False
         self.high_temp_counter = np.sum(values > self.filter_temp)
         
-        if (self.high_temp_counter > 0 and self.buffer_counter == 0) and self.high_temp_counter >= self.safety_high_temp_counter: 
+        if (self.high_temp_counter > 0 and self.buffer_counter == 0) and self.high_temp_counter != self.safety_high_temp_counter: 
             print(self.high_temp_counter, self.safety_high_temp_counter)
             self.buffer_counter = 15
             if self.high_temp_counter != self.safety_high_temp_counter:
@@ -198,9 +198,14 @@ class DetectionModule(threading.Thread):
         if (self.high_temp_counter != self.safety_high_temp_counter) and len(self.fire_detection_buffer) == 15:
             print('full buffer, proved')
             tested_list = []
-            for i in [self.fire_detection_buffer][10:]:
+            # print(self.fire_detection_buffer, '____________________')
+            for i in list(self.fire_detection_buffer)[10:]:
+                # print(i, '____________________')
                 tested_list.append(np.sum(i > self.filter_temp))
+            # print(tested_list, '_________________')
+            # print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
             if (sum(tested_list) / 5) > self.high_temp_counter_init :
+                print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
                 fire_detected = True
                 print("화재 감지")
             else:
