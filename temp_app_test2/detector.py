@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import queue
-from collections import deque
+from collections import deque 
 import threading
 import time
 import joblib
@@ -11,24 +11,40 @@ from sklearn.preprocessing import RobustScaler, MinMaxScaler
 # from gui import OutputModule
 
 """ 
-25/08/04
-수정점
-안전 상태와 위험 상태를 구분하기.
-안전 상태 : 1.열원이 없거나
-            2. 열원이 있더라도 변화가 없거나.
-            3. 열원이 감소
-
-위험 상태 : 안전 상태에서 
-            경계: 열원 추가 발생 (버퍼 사용 시작)
-            10초간 열원 변화 추적 및 판단
-            화재 인식: 열원이 추가적으로 더 생길 시(확산 시)
-            * 일단 더 생기는 경우 무조건 화재로 간주.
-              더 생겼지만 화재가 아닌 경우는 추후 피드백으로 보완하기
-
-리팩토링 사항:
+25/08/04 리팩토링 사항:
 - GUI의 열원 후처리 로직을 DetectionModule로 이동
 - 온도 필터링, 가중치 적용, 보간 처리를 detector에서 수행
 - 화재/연기 감지 로직 통합
+
+
+250805 
+추가 수정사항:
+    - 중앙 센서와 별개로, 모서리 센서의 경우 별도의 보정값 필요함.
+    - 1~8 단계로 센서값을 부여할 필요
+    - 5.5 열 까지는 적당히 측정되지만, 이후부터는 아슬아슬하게 감지됨
+    - 7,7열의 경우 높이 170cm 쯤에서 활성화됨.
+    - 센서의 정반대, 가장 먼 곳의 3칸은 측정되지 않음.
+    
+    화재 감지 알고리즘 추가사항
+    - 확산되지 않는 화재 -> 일단 열외
+    - deque 크기 확장. 1초당 3~4개 이므로 10초정도 고려?
+    - 열원 숫자에 따라 감지 레벨 변화
+        - 화재 감지 이전에
+        - 주의 / 경고 / 감지 3단계로 나누기
+        - 열원 발생시 주의
+            - 1deque로 판단 후 안전 처리
+        - 열원 추가 발생시 경고
+            - 2deque로 판단 후 안전 처리
+        - 감지는 실제 화재의 형상으로 열원이 계속해서 증가할 경우.
+        
+    열원의 지속적인 관리 필요 
+    -> safety 변수에 개수 뿐만이 아니라 열원 좌표도 추가하여 관리, dict로?
+        안전 열원이라고 판단시 리스트에서 제외
+        이동하여 새로운 열원이 될 경우 다시 감시 시작.
+        
+    다만 총합 열원 크기가 4개 이상일 경우 화재 경고
+    
+    
 """
 
 class DetectionModule(threading.Thread):
