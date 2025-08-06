@@ -7,6 +7,7 @@ import csv
 import os
 # import numpy as np # ReceiverModule에서는 직접적으로 사용되지 않으므로 제거 가능
 
+
 class ReceiverModule(threading.Thread):
     def __init__(self, detection_queue, port='COM4', baudrate=38400):
         super().__init__()
@@ -81,21 +82,24 @@ class ReceiverModule(threading.Thread):
                                 self.detection_queue.put(data_package)
                                 # print(f"ReceiverModule: 64개 값 패키지 완성 및 큐에 추가. 첫 5개 값: {received_values[:5]}")
                                 
-                                if not os.path.exists('./degree_test.csv'):
+                                cwd = os.getcwd().replace('\\', '/')
+                                PATH = f"{cwd}/_data/degree_test.csv"
+                                # print('here')
+                                if not os.path.exists(PATH):
                                     write_type = 'w'
                                 else:
                                     write_type = 'a'
                                 
-                                with open('./degree_test.csv', write_type , newline='') as csvfile:
+                                with open(PATH, write_type , newline='') as csvfile:
                                         csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                                         result = [datetime.now(), sensor_degree]
                                         result.extend(received_values)
                                         # print(result)
                                         csv_writer.writerow(result)
-                                        # csv_writer.writerow([datetime.now()])
-                                        # csv_writer.writerow([sensor_degree])
-                                        # for row in received_values:
-                                            # csv_writer.writerow([row])
+                                        csv_writer.writerow([datetime.now()])
+                                        csv_writer.writerow([sensor_degree])
+                                        for row in received_values:
+                                            csv_writer.writerow([row])
                                     
                                     
                         except ValueError:
