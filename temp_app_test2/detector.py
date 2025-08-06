@@ -59,6 +59,9 @@ class DetectionModule(threading.Thread):
         self.grid_size = 8
         self.data_signal = data_signal_obj
         
+        self.sensor_position = 'corner'
+        
+        
         # === 누적 이상 감지 횟수를 저장할 변수 ===
         self.anomaly_total_count = 0
         self.data_buffer = deque(maxlen=20)  # 최대 20프레임 보관
@@ -70,6 +73,7 @@ class DetectionModule(threading.Thread):
         self.filter_temp_add = 5
         self.filter_temp = 0
         self.weight_list = [3.8, 3.9, 4.0, 5.1]
+        self.weight_list_corner = [5, 5, 5, 5, 5, 5, 5, 5]
         self.interpolated_grid_size = 8  # 기본 보간 그리드 크기
         
         # === 화재/연기 감지 관련 변수 ===
@@ -84,7 +88,12 @@ class DetectionModule(threading.Thread):
         # 추가적인 열원이 계속 유지될 경우 화재로 간주.
         self.high_temp_counter = 0
         self.safety_high_temp_counter = 0
-        self.fire_detection_buffer = deque(maxlen=15)
+        self.safety_high_temp_dict = {'safety':0, 'caution':0, 'danger':0}
+        
+        # 1초당 3~4개. 약 10초인 30개로 설정
+        self.deque_size = 30
+        self.fire_detection_buffer = deque(maxlen=self.deque_size)
+        self.fire_detection_buffer2 = deque(maxlen=self.deque_size*2)
         self.buffer_counter = 0
         self.high_temp_counter_init = 0
         
@@ -133,6 +142,8 @@ class DetectionModule(threading.Thread):
     
     def update_detection_parameters(self, params):
         """GUI에서 전달받은 파라미터 업데이트"""
+        if 'position' in params:
+            self.sensor_position = params['sensor_position']
         if 'min_temp' in params:
             self.min_temp = params['min_temp']
         if 'max_temp' in params:
@@ -144,7 +155,7 @@ class DetectionModule(threading.Thread):
         if 'interpolated_grid_size' in params:
             self.interpolated_grid_size = params['interpolated_grid_size']
     
-    def apply_heat_source_filtering(self, values):
+    def apply_heat_source_filtering_center(self, values):
         """
         열원 필터링 및 가중치 적용 (GUI에서 이동)
         구역별로 다른 가중치를 적용하여 중앙부 열원을 강조
@@ -176,6 +187,48 @@ class DetectionModule(threading.Thread):
         
         return filtered_values
     
+    def apply_heat_source_filtering_corner(self, values):
+        """
+        열원 필터링 및 가중치 적용 (GUI에서 이동)
+        코너 설치 상태이므로 대각선으로 넓어지면서 8개의 가중치 부여.
+        """
+        values = np.array(values, np.float32).reshape(8, 8)
+        filtered_values = values.copy()
+        
+        # 평균 온도 계산 및 필터 온도 설정 (기존 로직과 동일)
+        self.avg_temp = np.mean(values)
+        self.filter_temp = self.avg_temp + self.filter_temp_add
+        
+        for i in range(8): # 행 (row)
+            for j in range(8): # 열 (column)
+                current_temp = values[i][j]
+                
+                if current_temp >= self.filter_temp:
+                    # 우측 상단 (0, 7)으로부터의 맨해튼 거리(대각선 거리) 계산
+                    # distance = (i - 0) + (7 - j)
+                    distance = i + (7 - j)
+                    
+                    # 거리에 따라 8개의 가중치를 부여하는 로직
+                    # 거리가 멀어질수록 가중치 인덱스도 커집니다.
+                    if distance == 0:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[0]
+                    elif distance == 1:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[1]
+                    elif distance == 2:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[2]
+                    elif distance == 3:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[3]
+                    elif distance == 4:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[4]
+                    elif distance == 5:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[5]
+                    elif distance == 6:
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[6]
+                    else: # distance가 7 이상일 때 (가장 먼 구역)
+                        filtered_values[i][j] = current_temp * self.weight_list_corner[7]
+        
+        return filtered_values
+    
     def interpolate_temperature_data(self, filtered_values):
         """
         온도 데이터 보간 처리 (GUI에서 이동)
@@ -184,66 +237,127 @@ class DetectionModule(threading.Thread):
         grid_multiplier = self.interpolated_grid_size // 8
         if grid_multiplier <= 1:
             return filtered_values
-        
+         
         # 단순 반복을 통한 보간 (nearest neighbor 방식)
         interpolated_values = filtered_values.repeat(grid_multiplier, axis=0).repeat(grid_multiplier, axis=1)
         return interpolated_values
     
     def detect_fire_and_smoke(self, values):
         """
-        화재 및 연기 감지 로직 (GUI에서 이동 및 개선)
+        화재 및 연기 감지 로직
+            
+            
+        화재 감지 알고리즘 추가사항
+        - 확산되지 않는 화재 -> 일단 열외
+        - deque 크기 확장. 1초당 3~4개 이므로 10초정도 고려?
+        - 열원 숫자에 따라 감지 레벨 변화
+            - 화재 감지 이전에
+            - 주의 / 경고 / 감지 3단계로 나누기
+            - 열원 발생시 주의
+                - 1deque로 판단 후 안전 처리
+            - 열원 추가 발생시 경고
+                - 2deque로 판단 후 안전 처리
+            - 감지는 실제 화재의 형상으로 열원이 계속해서 증가할 경우.
+            
+        열원의 지속적인 관리 필요 
+        -> safety 변수에 개수 뿐만이 아니라 열원 좌표도 추가하여 관리, dict로?
+            안전 열원이라고 판단시 리스트에서 제외
+            이동하여 새로운 열원이 될 경우 다시 감시 시작.
+            
+        다만 총합 열원 크기가 4개 이상일 경우 화재 경고
+        
         """
-        # max_temp = np.max(values)
-        # avg_temp = np.mean(values)
         fire_detected = False
         smoke_detected = False
         self.high_temp_counter = np.sum(values > self.filter_temp)
         
-        if (self.high_temp_counter > 0 and self.buffer_counter == 0) and self.high_temp_counter != self.safety_high_temp_counter: 
-            print(self.high_temp_counter, self.safety_high_temp_counter)
-            self.buffer_counter = 15
-            if self.high_temp_counter != self.safety_high_temp_counter:
+        #   열원 존재 조건                  버퍼가 끝났다는 조건                기존 열원에 변화가 있다는 조건
+        if (self.high_temp_counter > 0 and self.buffer_counter == 0) and self.high_temp_counter != len(self.safety_high_temp_dict): 
+            # print(self.high_temp_counter, self.safety_high_temp_dict)
+            self.buffer_counter = self.deque_size
+            if self.high_temp_counter != len(self.safety_high_temp_dict):
                 self.high_temp_counter_init = np.sum(values > self.filter_temp)
+                # print(np.where(values > self.filter_temp))
         
         if self.buffer_counter > 0 :
             self.fire_detection_buffer.append(values)
             self.buffer_counter -= 1
-               
-        # 화재 감지 조건
         
-        if (self.high_temp_counter != self.safety_high_temp_counter) and len(self.fire_detection_buffer) == 15:
-            print('full buffer, proved')
-            tested_list = []
-            # print(self.fire_detection_buffer, '____________________')
-            for i in list(self.fire_detection_buffer)[10:]:
-                # print(i, '____________________')
-                tested_list.append(np.sum(i > self.filter_temp))
-            # print(tested_list, '_________________')
-            # print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
-            if (sum(tested_list) / 5) > self.high_temp_counter_init :
-                print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
-                fire_detected = True
-                print("화재 감지")
+        
+        # 주의 단계 2배 데크로 테스트
+        if self.safety_high_temp_dict['caution']:
+            self.fire_detection_buffer2.append(values)
+            # print(self.fire_detection_buffer2)
+        if len(self.fire_detection_buffer2) == self.deque_size*2 and self.high_temp_counter != len(self.safety_high_temp_dict):
+            is_fire, last_coordinate = self.is_fire(self.fire_detection_buffer2)
+            if is_fire :
+                # print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
+                print(f"열원 좌표 {last_coordinate}")
+                self.safety_high_temp_dict['danger'] = last_coordinate
+                print("화재 위험")
+                fire_detected = is_fire
             else:
                 self.safety_high_temp_counter = self.high_temp_counter_init
-                print("self.safety_high_temp_counter 갱신", self.safety_high_temp_counter)
-            self.fire_detection_buffer.clear()
+                self.safety_high_temp_dict['danger'] = 0
+                self.safety_high_temp_dict['caution'] = 0
+                self.safety_high_temp_dict['safety'] = last_coordinate
+                print(f"안전열원 갱신(확장) {len(self.safety_high_temp_dict['safety'][0])} {self.safety_high_temp_dict['safety']}")
+            self.fire_detection_buffer2.clear()
+        
+        # 화재 감지 조건
+        
+        if (self.high_temp_counter != self.safety_high_temp_counter) and len(self.fire_detection_buffer) == self.deque_size:
+            print(f'full buffer, proved {len(self.fire_detection_buffer)} == {self.deque_size}')
+            # tested_list = []
+            # print(self.fire_detection_buffer, '____________________')
+            # for i in list(self.fire_detection_buffer)[10:]:
+            #     # print(i, '____________________')
+            #     tested_list.append(np.sum(i > self.filter_temp))
+            # print(tested_list, '_________________')
+            # print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
+            
+            is_fire, last_coordinate = self.is_fire(deque=self.fire_detection_buffer)
+            if is_fire :
+                # print("화재 테스트", (sum(tested_list) / 5), self.high_temp_counter_init)
+                print(f"열원 증가 감지 열원 좌표 {last_coordinate}")
+                self.safety_high_temp_dict['caution'] = last_coordinate
+            else:
+                self.safety_high_temp_counter = self.high_temp_counter_init
+                self.safety_high_temp_dict['safety'] = last_coordinate
+                print(f"안전 열원 갱신 {len(self.safety_high_temp_dict['safety'][0])} {self.safety_high_temp_dict['safety']}")
+            # self.fire_detection_buffer.clear()
                 
-        
-        # 최근 N회 중 임계값 이상 감지되면 최종 감지
-        # fire_detected = sum(self.fire_detection_buffer) >= self.detection_count_threshold
-        
-        # 연기 감지 조건
-        # smoke_condition = (
-        #     max_temp > self.smoke_threshold_temp and 
-        #     medium_temp_count >= 5 and  # 5개 이상의 셀이 연기 임계온도 초과
-        #     avg_temp > self.base_temperature + 3  # 평균 온도가 기준보다 3도 이상 높음
-        # )
-        # self.smoke_detection_buffer.append(smoke_condition)
-        # smoke_detected = sum(self.smoke_detection_buffer) >= self.detection_count_threshold
-        
-        
+
         return fire_detected, smoke_detected
+    
+    def is_fire(self, deque):
+        """ 
+        deque를 받아 안의 데이터로 열원이 확산되었는지, 아닌지를 판별함.
+        기본 deque와 확장 deque간 다른 메커니즘 사용 
+        """
+        # print(len(deque))
+        # print(deque)
+        last_coordinate = np.where(deque[-1] > self.filter_temp)
+        # last_coordinate = (0)
+        frontlist = list()
+        backlist = list()
+        if deque:
+            for i in range((deque.maxlen//2)):
+                if len(deque) <= 1: break
+                # print('f',len(deque), len(frontlist))
+                frontlist.append(np.sum(deque.popleft() > self.filter_temp))
+                # print('b',len(deque), len(backlist))
+                backlist.append(np.sum(deque.pop() > self.filter_temp))
+            front_avg = sum(frontlist) / (deque.maxlen//2)
+            back_avg = sum(backlist) / (deque.maxlen//2)
+            print('fb', front_avg, back_avg)
+            if front_avg >= back_avg : 
+                return False, last_coordinate 
+            else:
+                return True, last_coordinate 
+    
+    
+    
     
     def calculate_detection_stats(self, original_values, processed_values):
         """
@@ -298,7 +412,10 @@ class DetectionModule(threading.Thread):
                             object_detection = self.model_predict(data_package, 'rfm')
                         
                         # 3. 열원 후처리 수행
-                        filtered_values = self.apply_heat_source_filtering(values)
+                        if self.sensor_position == 'corner':
+                            filtered_values = self.apply_heat_source_filtering_corner(values)
+                        else:
+                            filtered_values = self.apply_heat_source_filtering_center(values)
                         interpolated_values = self.interpolate_temperature_data(filtered_values)
                         
                         # 4. 화재/연기 감지
@@ -388,7 +505,8 @@ class DetectionModule(threading.Thread):
             'smoke_detected': data_package.get('smoke_detected', False),
             'detection_stats': data_package.get('detection_stats', {}),
             'interpolated_grid_size': data_package.get('interpolated_grid_size', 8),
-            'processing_params': data_package.get('processing_params', {})
+            'processing_params': data_package.get('processing_params', {}),
+            'heat_source_dict': self.safety_high_temp_dict
         }
         
         # GUI 큐로 전달

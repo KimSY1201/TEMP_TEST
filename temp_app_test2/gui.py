@@ -3,7 +3,7 @@
 - 열원 필터링, 가중치 적용, 보간 처리를 detector에서 수행
 - GUI는 처리된 데이터를 받아서 표시만 담당
 - 파라미터 변경 시 detector에 업데이트 신호 전송
-
+- 센서 위치 변경 시 가중치 UI 동적 업데이트 추가
 
 """
 
@@ -14,8 +14,8 @@ import numpy as np
 import random
 from datetime import datetime
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-                             QLabel, QGridLayout, QMessageBox, QPushButton,
-                             QSlider, QSpinBox, QDoubleSpinBox, QCheckBox)
+                             QLabel, QGridLayout, QMessageBox, QPushButton, QRadioButton,
+                             QSlider, QSpinBox, QDoubleSpinBox, QCheckBox, QButtonGroup)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
 import queue
@@ -43,7 +43,7 @@ QWidget {
 
 /* 제목 레이블 스타일 */
 QLabel[class="TitleLabel"] {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     color: #FFFFFF;
     padding: 2px;
@@ -214,7 +214,11 @@ class OutputModule(QWidget):
         self.interpolated_grid_size = self.DEFAULT_INTERPOLATED_GRID_SIZE
         self.cell_size = self.max_height // self.interpolated_grid_size
         self.font_size = self.cell_size // 3
-
+        
+        # 센서 위치에 따른 토글 변수
+        self.sensor_position = 'corner'
+        
+        # 이상 감지 관련
         self.anomaly_count = 0
         self.log_filename = "detected_values.txt"
         self.fire_alert_triggered = False
@@ -235,9 +239,15 @@ class OutputModule(QWidget):
         self.filter_temp_add = 5
         self.filter_temp = 0
         self.weight_list = [3.8, 4, 4.3, 5]
+        self.weight_list_corner = [5, 5, 5, 5, 5, 5, 5, 5]
 
         # == 온도 출력 on off == 
         self.display_degree = True
+        
+        # 가중치 UI 관련 변수들
+        self.weight_grid_layout = None
+        self.weight_spinboxes = []
+        self.weight_layouts = []
         
         self.init_ui()
 
@@ -257,13 +267,52 @@ class OutputModule(QWidget):
         left_panel_layout = QVBoxLayout(left_panel)
         left_panel_layout.setSpacing(5)
 
-        self.sensor_temp_label = QLabel("센서 온도: N/A")
-        self.sensor_temp_label.setProperty("class", "TitleLabel")
+        ## 센서 위치에 따른 다른 보정 함수
+        position_layout = QHBoxLayout()
         
-        self.max_temp_label = QLabel("최고 온도: N/A")
+        # 라디오 버튼 그룹 생성 (상호 배타적 선택 보장)
+        self.position_button_group = QButtonGroup(self)
+        
+        self.posi_center_sensor = QRadioButton("중앙", self)
+        self.posi_corner_sensor = QRadioButton("모서리", self)
+        
+        # 버튼 그룹에 추가
+        self.position_button_group.addButton(self.posi_center_sensor, 0)
+        self.position_button_group.addButton(self.posi_corner_sensor, 1)
+        
+        # 기본 선택 (모서리)
+        self.posi_corner_sensor.setChecked(True)
+        
+        # 시그널 연결
+        self.posi_center_sensor.toggled.connect(self.position_toggled)
+        self.posi_corner_sensor.toggled.connect(self.position_toggled)
+        
+        position_layout.addWidget(self.posi_center_sensor)
+        position_layout.addWidget(self.posi_corner_sensor)
+        
+        ## 상단 온도 통합 레이아웃
+        temp_grid_layout = QGridLayout()
+        sensor_label = QLabel("센서 온도")
+        sensor_label.setProperty("class", "TitleLabel")
+        max_label = QLabel("최고 온도")
+        max_label.setProperty("class", "TitleLabel")
+        min_label = QLabel("평균 온도")
+        min_label.setProperty("class", "TitleLabel")
+        
+        self.sensor_temp_label = QLabel("N/A")
+        self.sensor_temp_label.setProperty("class", "TitleLabel")
+        self.max_temp_label = QLabel("N/A")
         self.max_temp_label.setProperty("class", "TitleLabel")
-        self.avg_temp_label = QLabel("평균 온도: N/A")
+        self.avg_temp_label = QLabel("N/A")
         self.avg_temp_label.setProperty("class", "TitleLabel")
+        
+        temp_grid_layout.addWidget(sensor_label, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(max_label, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(min_label, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter )
+        
+        temp_grid_layout.addWidget(self.sensor_temp_label, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(self.max_temp_label, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(self.avg_temp_label, 1, 2, alignment=Qt.AlignmentFlag.AlignCenter )
         
         self.etc_label = QLabel("기타: N/A")
         self.etc_label.setProperty("class", "TitleLabel")
@@ -277,6 +326,29 @@ class OutputModule(QWidget):
         self.object_detection_label = QLabel("객체: N/A")
         self.object_detection_label.setProperty("class", "TitleLabel")
         
+        heat_source_grid = QGridLayout()
+        safety_label = QLabel("safety")
+        safety_label.setProperty("class", "TitleLabel")
+        caution_label = QLabel("caution")
+        caution_label.setProperty("class", "TitleLabel")
+        danger_label = QLabel("danger")
+        danger_label.setProperty("class", "TitleLabel")
+        
+        self.safety_label = QLabel("N/A")
+        self.safety_label.setProperty("class", "TitleLabel")
+        self.caution_label = QLabel("N/A")
+        self.caution_label.setProperty("class", "TitleLabel")
+        self.danger_label = QLabel("N/A")
+        self.danger_label.setProperty("class", "TitleLabel")
+        
+        heat_source_grid.addWidget(safety_label, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter )
+        heat_source_grid.addWidget(caution_label, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter )
+        heat_source_grid.addWidget(danger_label, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter )
+        
+        heat_source_grid.addWidget(self.safety_label, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter )
+        heat_source_grid.addWidget(self.caution_label, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter )
+        heat_source_grid.addWidget(self.danger_label, 1, 2, alignment=Qt.AlignmentFlag.AlignCenter )
+        
         self.test_label = QLabel("test: N/A")
         self.test_label.setProperty("class", "TitleLabel")
 
@@ -286,6 +358,7 @@ class OutputModule(QWidget):
         # -- 온도 표시 위젯 --
         display_degree = QCheckBox("온도 표시", self)
         display_degree.stateChanged.connect(self.display_degree_control)
+        display_degree.setChecked(True)  # 기본값 설정
                 
         # --- 히트맵 온도 범위 조절 위젯 ---
         temp_range_group_box = QWidget()
@@ -302,32 +375,21 @@ class OutputModule(QWidget):
         
         # 필터링 적용 온도 조절 UI
         filter_temp_layout, self.filter_temp_spinbox = self._create_temp_control_row("기준", self.filter_temp_add)
-        # 가중치 조절 UI
-        weight_layout1, self.weight1_spinbox = self._create_temp_control_row("1", self.weight_list[0])
-        weight_layout2, self.weight2_spinbox = self._create_temp_control_row("2", self.weight_list[1])
-        weight_layout3, self.weight3_spinbox = self._create_temp_control_row("3", self.weight_list[2])
-        weight_layout4, self.weight4_spinbox = self._create_temp_control_row("4", self.weight_list[3])
         
-
         # Signal 연결 - detector에 파라미터 업데이트 전송
         self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
         self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
-        
         self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
-        self.weight1_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('w1', value))
-        self.weight2_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('w2', value))
-        self.weight3_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('w3', value))
-        self.weight4_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('w4', value))
-
+        
         temp_range_layout.addWidget(temp_range_title)
         temp_range_layout.addLayout(min_temp_layout)
         temp_range_layout.addLayout(max_temp_layout)
         temp_range_layout.addLayout(filter_temp_layout)
-        temp_range_layout.addLayout(weight_layout1)
-        temp_range_layout.addLayout(weight_layout2)
-        temp_range_layout.addLayout(weight_layout3)
-        temp_range_layout.addLayout(weight_layout4)
-
+        
+        # 가중치 조절 UI 레이아웃 생성
+        self.weight_grid_layout = QGridLayout()
+        self._create_weight_controls()
+        
         # --- 그리드 크기 조절 위젯 ---
         grid_size_group_box = QWidget()
         grid_size_group_box.setObjectName("TopPanel")
@@ -363,18 +425,19 @@ class OutputModule(QWidget):
         self.time_label = QLabel("시간: N/A")
         self.time_label.setFont(QFont("Arial", 9))
 
-        left_panel_layout.addWidget(self.sensor_temp_label)
-        left_panel_layout.addWidget(self.max_temp_label)
-        left_panel_layout.addWidget(self.avg_temp_label)
+        # left_panel_layout에 위젯들 추가
+        left_panel_layout.addLayout(position_layout)
+        left_panel_layout.addLayout(temp_grid_layout)
         left_panel_layout.addWidget(self.etc_label)
         left_panel_layout.addWidget(self.anomaly_count_label)
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
         left_panel_layout.addWidget(self.object_detection_label)
+        left_panel_layout.addLayout(heat_source_grid)
         left_panel_layout.addWidget(self.test_label)
-        left_panel_layout.addWidget(self.humidity_label)
         left_panel_layout.addWidget(display_degree)
         left_panel_layout.addWidget(temp_range_group_box)
+        left_panel_layout.addLayout(self.weight_grid_layout)
         left_panel_layout.addWidget(grid_size_group_box)
         left_panel_layout.addStretch(1)
         left_panel_layout.addWidget(self.log_button)
@@ -393,8 +456,91 @@ class OutputModule(QWidget):
         main_layout.setColumnStretch(1, 1)
         main_layout.setRowStretch(0, 1)
     
+    def _create_weight_controls(self):
+        """센서 위치에 따른 가중치 조절 UI 생성"""
+        # 기존 가중치 UI 제거
+        self._clear_weight_controls()
+        
+        # 현재 센서 위치에 따른 가중치 리스트 및 개수 결정
+        if self.sensor_position == 'center':
+            weights_list = self.weight_list
+            num_weights = 4
+        elif self.sensor_position == 'corner':
+            weights_list = self.weight_list_corner
+            num_weights = 8
+        
+        # 새로운 가중치 UI 생성
+        self.weight_layouts = []
+        self.weight_spinboxes = []
+        
+        for i in range(num_weights):
+            weight_label = str(i + 1)
+            current_weight = weights_list[i]
+            
+            # _create_temp_control_row 함수 호출
+            layout, spinbox = self._create_temp_control_row(weight_label, current_weight)
+            
+            # 시그널 연결: 람다 함수에 i를 전달하여 어떤 가중치인지 구분
+            spinbox.valueChanged.connect(lambda value, index=i: self._update_filter_weight(f'w{index + 1}', value))
+            
+            self.weight_layouts.append(layout)
+            self.weight_spinboxes.append(spinbox)
+            
+            # 그리드 레이아웃에 추가
+            row = i // 2
+            col = i % 2
+            self.weight_grid_layout.addLayout(layout, row, col)
+    
+    def _clear_weight_controls(self):
+        """기존 가중치 UI 요소들 제거"""
+        # 기존 레이아웃에서 모든 아이템 제거
+        while self.weight_grid_layout.count():
+            child = self.weight_grid_layout.takeAt(0)
+            if child.layout():
+                self._clear_layout(child.layout())
+            elif child.widget():
+                child.widget().deleteLater()
+        
+        # 리스트 초기화
+        self.weight_layouts.clear()
+        self.weight_spinboxes.clear()
+    
+    def _clear_layout(self, layout):
+        """레이아웃 내의 모든 위젯 제거"""
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+            elif child.layout():
+                self._clear_layout(child.layout())
+    
+    def position_toggled(self):
+        """센서 위치 라디오 버튼 토글 시 호출"""
+        if self.posi_center_sensor.isChecked():
+            self.sensor_position = 'center'
+            print('Position changed to: center')
+        elif self.posi_corner_sensor.isChecked():
+            self.sensor_position = 'corner'
+            print('Position changed to: corner')
+        
+        # 가중치 UI 다시 생성
+        self._create_weight_controls()
+        
+        # detector에 센서 위치 업데이트 전송
+        params = {
+            'sensor_position': self.sensor_position,
+        }
+        self.data_signal.parameter_update_signal.emit(params)
+    
     def display_degree_control(self, state):
-        self.display_degree = state
+        """온도 표시 체크박스 제어"""
+        self.display_degree = bool(state)
+        
+        # 현재 데이터로 히트맵 다시 업데이트 (온도 표시 여부 적용)
+        if self.current_data_package:
+            processed_values = self.current_data_package.get('processed_values', [])
+            if processed_values:
+                self.update_heatmap(processed_values)
         
     # === 온도 조절 UI 생성 헬퍼 함수 ===
     def _create_temp_control_row(self, label_text, initial_value):
@@ -402,27 +548,15 @@ class OutputModule(QWidget):
         label = QLabel(label_text)
         label.setProperty("class", "InfoLabel")
 
-        dec_button = QPushButton("-")
-        dec_button.setProperty("class", "AdjustButton")
-
         spin_box = QDoubleSpinBox()
         spin_box.setRange(-50.0, 100.0)
         spin_box.setSingleStep(0.1)
         spin_box.setDecimals(1)
         spin_box.setValue(initial_value)
 
-        inc_button = QPushButton("+")
-        inc_button.setProperty("class", "AdjustButton")
-
-        # 버튼 클릭 시그널 연결
-        dec_button.clicked.connect(lambda: self._adjust_temp(spin_box, -0.1))
-        inc_button.clicked.connect(lambda: self._adjust_temp(spin_box, 0.1))
-
-        layout.addWidget(label)
         layout.addStretch(1)
-        layout.addWidget(dec_button)
+        layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignRight)
         layout.addWidget(spin_box)
-        layout.addWidget(inc_button)
 
         return layout, spin_box
     
@@ -447,29 +581,63 @@ class OutputModule(QWidget):
     def _update_filter_weight(self, name, value):
         """필터링 파라미터 업데이트 시 detector에 전송"""
         if name == 'filter_add':
-           self.filter_temp_add = value
-           print(f'filter_add {value} 갱신')
+            self.filter_temp_add = value
+            print(f'filter_add {value} 갱신')
+        
+        if self.sensor_position == 'center':
+            if name == 'w1':
+                self.weight_list[0] = value
+                print(f'w1 {value} 갱신')
+            elif name == 'w2':
+                self.weight_list[1] = value
+                print(f'w2 {value} 갱신')
+            elif name == 'w3':
+                self.weight_list[2] = value
+                print(f'w3 {value} 갱신')
+            elif name == 'w4':
+                self.weight_list[3] = value
+                print(f'w4 {value} 갱신')
+
+            # detector에 파라미터 업데이트 전송
+            params = {
+                'filter_temp_add': self.filter_temp_add,
+                'weight_list': self.weight_list.copy()
+            }
             
-        if name == 'w1':
-            self.weight_list[0] = value
-            print(f'w1 {value} 갱신')
-        elif name == 'w2':
-            self.weight_list[1] = value
-            print(f'w2 {value} 갱신')
-        elif name == 'w3':
-            self.weight_list[2] = value
-            print(f'w3 {value} 갱신')
-        elif name == 'w4':
-            self.weight_list[3] = value
-            print(f'w4 {value} 갱신')
+        elif self.sensor_position == 'corner':
+            if name == 'w1':
+                self.weight_list_corner[0] = value
+                print(f'w1 {value} 갱신')
+            elif name == 'w2':
+                self.weight_list_corner[1] = value
+                print(f'w2 {value} 갱신')
+            elif name == 'w3':
+                self.weight_list_corner[2] = value
+                print(f'w3 {value} 갱신')
+            elif name == 'w4':
+                self.weight_list_corner[3] = value
+                print(f'w4 {value} 갱신')
+            elif name == 'w5':
+                self.weight_list_corner[4] = value
+                print(f'w5 {value} 갱신')
+            elif name == 'w6':
+                self.weight_list_corner[5] = value
+                print(f'w6 {value} 갱신')
+            elif name == 'w7':
+                self.weight_list_corner[6] = value
+                print(f'w7 {value} 갱신')
+            elif name == 'w8':
+                self.weight_list_corner[7] = value
+                print(f'w8 {value} 갱신')
 
-        # detector에 파라미터 업데이트 전송
-        params = {
-            'filter_temp_add': self.filter_temp_add,
-            'weight_list': self.weight_list.copy()
-        }
+            # detector에 파라미터 업데이트 전송
+            params = {
+                'filter_temp_add': self.filter_temp_add,
+                'weight_list_corner': self.weight_list_corner.copy()
+            }
+        
         self.data_signal.parameter_update_signal.emit(params)
-
+            
     def _create_heatmap_cells(self):
         # 기존 셀들을 모두 제거
         if self.grid_cells:
@@ -560,6 +728,9 @@ class OutputModule(QWidget):
         fire_detected = data_package.get('fire_detected', False)
         smoke_detected = data_package.get('smoke_detected', False)
         
+        # heat source dict
+        heat_source_dict = data_package.get('heat_source_dict', {})        
+        
         # 그리드 크기 업데이트 (detector에서 처리된 크기)
         detector_grid_size = data_package.get('interpolated_grid_size', self.interpolated_grid_size)
         if detector_grid_size != self.interpolated_grid_size:
@@ -574,15 +745,22 @@ class OutputModule(QWidget):
             avg_temp = detection_stats.get('avg_temp', np.mean(values))
             filter_temp = processing_params.get('filter_temp', 0)
             
-            self.sensor_temp_label.setText(f"센서 온도: {sensor_degree:.1f}°C")
-            self.max_temp_label.setText(f"최고 온도: {max_temp:.1f}°C")
-            self.avg_temp_label.setText(f"평균 온도: {avg_temp:.1f}°C")
+            self.sensor_temp_label.setText(f"{sensor_degree:.1f}°C")
+            self.max_temp_label.setText(f"{max_temp:.1f}°C")
+            self.avg_temp_label.setText(f"{avg_temp:.1f}°C")
             self.etc_label.setText(f"기타: {etc}")
             self.object_detection_label.setText(f"객체: {object_detection}")
             self.test_label.setText(f"필터 온도: {filter_temp:.1f}°C")
+            
+            # heat source 정보 업데이트
+            if heat_source_dict:
+                self.safety_label.setText(str(heat_source_dict.get('safety', 'N/A')))
+                self.caution_label.setText(str(heat_source_dict.get('caution', 'N/A')))
+                self.danger_label.setText(str(heat_source_dict.get('danger', 'N/A')))
+            
         else:
-            self.max_temp_label.setText(f"최고 온도: N/A")
-            self.avg_temp_label.setText("평균 온도: N/A")
+            self.max_temp_label.setText(f"N/A")
+            self.avg_temp_label.setText("N/A")
 
         # 상태 표시기 업데이트
         self.update_indicator_status(self.fire_indicator, fire_detected)
@@ -642,7 +820,7 @@ class OutputModule(QWidget):
                 color = self.get_color_from_value(value)
                 cell = self.grid_cells[i][j]
                 
-                # 셀 텍스트 업데이트
+                # 셀 텍스트 업데이트 (온도 표시 여부에 따라)
                 cell.setText(f"{value:.1f}" if self.display_degree else "")
                 
                 # 셀 스타일 업데이트
@@ -749,91 +927,3 @@ class GUIUpdateThread(QThread):
     def stop(self):
         self.running = False
         self.wait()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    app.setStyleSheet(GLOBAL_STYLESHEET)
-    
-    primary_screen = app.primaryScreen()
-    available_rect = primary_screen.availableGeometry()
-
-    # 1. 데이터 통신을 위한 큐와 시그널 객체 생성
-    detection_queue = queue.Queue()
-    gui_queue = queue.Queue()
-    data_signal = DataSignal()
-    
-    # 2. GUI 인스턴스 생성
-    output_gui = OutputModule(data_signal, available_rect)
-    output_gui.showMaximized()
-
-    # 3. DetectionModule 임포트 및 인스턴스 생성
-    try:
-        from detector import DetectionModule
-        detection_module = DetectionModule(detection_queue, gui_queue, threshold=10.0)
-        
-        # 4. 파라미터 업데이트 시그널 연결
-        data_signal.parameter_update_signal.connect(detection_module.update_detection_parameters)
-        
-        # 5. GUI 업데이트 스레드 생성
-        gui_update_thread = GUIUpdateThread(gui_queue, data_signal)
-        
-        # 6. 데이터 생성 스레드 인스턴스 생성
-        data_generator = DataGeneratorThread(detection_queue, data_signal)
-        
-        # 7. 프로그램 종료 시 스레드가 안전하게 종료되도록 설정
-        app.aboutToQuit.connect(data_generator.stop)
-        app.aboutToQuit.connect(detection_module.stop)
-        app.aboutToQuit.connect(gui_update_thread.stop)
-
-        # 8. 스레드 시작
-        data_generator.start()
-        detection_module.start()
-        gui_update_thread.start()
-        
-        print("모든 모듈이 성공적으로 시작되었습니다.")
-        
-    except ImportError as e:
-        print(f"DetectionModule을 찾을 수 없습니다: {e}")
-        print("detector.py 파일이 같은 디렉토리에 있는지 확인하세요.")
-        
-        # DetectionModule 없이 GUI만 실행 (테스트용)
-        class DummyDataGenerator:
-            def __init__(self, signal_obj):
-                self.signal = signal_obj
-                self.timer = QTimer()
-                self.timer.timeout.connect(self.generate_data)
-                self.time_counter = 0
-
-            def start(self):
-                self.timer.start(1000)
-
-            def generate_data(self):
-                self.time_counter += 1
-                random_values = np.random.uniform(15.0, 35.0, OutputModule.ORIGINAL_GRID_SIZE**2)
-                fire_detected = random.random() < 0.05
-                smoke_detected = random.random() < 0.02
-
-                data_package = {
-                    'time': f"00:00:{self.time_counter:02d}",
-                    'values': random_values.tolist(),
-                    'processed_values': random_values.tolist(),  # 단순히 동일한 값 사용
-                    'fire_detected': fire_detected,
-                    'smoke_detected': smoke_detected,
-                    'detection_stats': {
-                        'max_temp': np.max(random_values),
-                        'avg_temp': np.mean(random_values)
-                    },
-                    'processing_params': {
-                        'filter_temp': np.mean(random_values) + 5
-                    },
-                    'object_detection': ['test_object'],
-                    'sensor_degree': np.mean(random_values),
-                    'etc': [50.0, 60.0]
-                }
-                self.signal.update_data_signal.emit(data_package)
-
-        dummy_gen = DummyDataGenerator(data_signal)
-        dummy_gen.start()
-        print("테스트 모드로 실행 중 (DetectionModule 없음)")
-
-    sys.exit(app.exec())

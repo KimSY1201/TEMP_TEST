@@ -96,10 +96,7 @@ class ReceiverModule(threading.Thread):
                                         result.extend(received_values)
                                         # print(result)
                                         csv_writer.writerow(result)
-                                        csv_writer.writerow([datetime.now()])
-                                        csv_writer.writerow([sensor_degree])
-                                        for row in received_values:
-                                            csv_writer.writerow([row])
+                                        
                                     
                                     
                         except ValueError:
