@@ -10,5 +10,7 @@ _data/
 _temp_app_0731/
 temp_app2/
 main.spec
+test/
 
 */_data
+*/_model

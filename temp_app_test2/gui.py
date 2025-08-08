@@ -9,6 +9,12 @@
 """ 250807 평균온도 필터링 추가
 """
 
+""" 2025/01/XX 리팩토링:
+- GUI 우선 로딩 및 포트 선택 기능 추가
+- 포트 연결/해제 상태 표시 추가
+- 동적 포트 전환 기능 구현
+"""
+
 import sys
 import os
 import subprocess
@@ -17,7 +23,8 @@ import random
 from datetime import datetime
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton, QRadioButton,
-                             QSlider, QSpinBox, QDoubleSpinBox, QCheckBox, QButtonGroup)
+                             QSlider, QSpinBox, QDoubleSpinBox, QCheckBox, QButtonGroup,
+                             QComboBox, QGroupBox, QFrame, QTextBrowser)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
 import queue
@@ -43,6 +50,24 @@ QWidget {
     padding: 10px;
 }
 
+/* 연결 상태 패널 스타일 */
+#ConnectionPanel {
+    background-color: #4A4A4A;
+    border-radius: 6px;
+    padding: 8px;
+    border: 2px solid #666666;
+}
+
+#ConnectionPanel[connected="true"] {
+    border-color: #4CAF50;
+    background-color: #2E4A2E;
+}
+
+#ConnectionPanel[connected="false"] {
+    border-color: #F44336;
+    background-color: #4A2E2E;
+}
+
 /* 제목 레이블 스타일 */
 QLabel[class="TitleLabel"] {
     font-size: 16px;
@@ -53,6 +78,12 @@ QLabel[class="TitleLabel"] {
 
 /* 일반 정보 레이블 스타일 */
 QLabel[class="InfoLabel"] {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* 연결 상태 레이블 스타일 */
+QLabel[class="ConnectionLabel"] {
     font-size: 12px;
     font-weight: bold;
 }
@@ -88,12 +119,45 @@ QPushButton:pressed {
     background-color: #4A4A4A;
 }
 
+/* 연결 버튼 특별 스타일 */
+QPushButton[buttonType="connect"] {
+    background-color: #4CAF50;
+}
+QPushButton[buttonType="connect"]:hover {
+    background-color: #5CBF60;
+}
+
+QPushButton[buttonType="disconnect"] {
+    background-color: #F44336;
+}
+QPushButton[buttonType="disconnect"]:hover {
+    background-color: #FF5346;
+}
+
 /* 온도 조절 버튼 작은 스타일 */
 QPushButton[class="AdjustButton"] {
     font-size: 12px;
     font-weight: bold;
     padding: 4px 8px;
     min-width: 30px;
+}
+
+/* QComboBox 스타일 */
+QComboBox {
+    background-color: #2E2E2E;
+    color: #FFFFFF;
+    border: 1px solid #666666;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 80px;
+}
+QComboBox::drop-down {
+    border: none;
+}
+QComboBox::down-arrow {
+    border: none;
 }
 
 /* QDoubleSpinBox 스타일 */
@@ -135,7 +199,9 @@ class DataSignal(QObject):
     # DetectionModule로 파라미터 업데이트를 전송하는 시그널
     parameter_update_signal = pyqtSignal(dict)
     anomaly_detected_signal = pyqtSignal(int)
-
+    # 포트 변경 시그널 추가
+    port_change_signal = pyqtSignal(dict)
+    
 class DraggableNumberLabel(QLabel):
     """
     마우스 드래그로 숫자를 변경할 수 있는 사용자 정의 QLabel 위젯.
@@ -217,6 +283,11 @@ class OutputModule(QWidget):
         self.cell_size = self.max_height // self.interpolated_grid_size
         self.font_size = self.cell_size // 3
         
+        # 포트 및 연결 상태 관리
+        self.current_port = ""
+        self.current_baudrate = 57600
+        self.is_connected = False
+        
         # 센서 위치에 따른 토글 변수
         self.sensor_position = 'corner'
         
@@ -226,6 +297,7 @@ class OutputModule(QWidget):
         self.fire_alert_triggered = False
         self.smoke_alert_triggered = False
         self.data_signal = data_signal_obj
+        
         self.grid_cells = []
         self.heatmap_layout = None
         self.current_data_package = None
@@ -256,7 +328,6 @@ class OutputModule(QWidget):
 
     def update_anomaly_count(self, count):
         self.anomaly_count = count
-        self.anomaly_count_label.setText(f"이상 감지: {self.anomaly_count} 회")
 
     def init_ui(self):
         self.setObjectName("MainWindow")
@@ -270,28 +341,9 @@ class OutputModule(QWidget):
         left_panel_layout = QVBoxLayout(left_panel)
         left_panel_layout.setSpacing(5)
 
-        ## 센서 위치에 따른 다른 보정 함수
-        position_layout = QHBoxLayout()
-        
-        # 라디오 버튼 그룹 생성 (상호 배타적 선택 보장)
-        self.position_button_group = QButtonGroup(self)
-        
-        self.posi_center_sensor = QRadioButton("중앙", self)
-        self.posi_corner_sensor = QRadioButton("모서리", self)
-        
-        # 버튼 그룹에 추가
-        self.position_button_group.addButton(self.posi_center_sensor, 0)
-        self.position_button_group.addButton(self.posi_corner_sensor, 1)
-        
-        # 기본 선택 (모서리)
-        self.posi_corner_sensor.setChecked(True)
-        
-        # 시그널 연결
-        self.posi_center_sensor.toggled.connect(self.position_toggled)
-        self.posi_corner_sensor.toggled.connect(self.position_toggled)
-        
-        position_layout.addWidget(self.posi_center_sensor)
-        position_layout.addWidget(self.posi_corner_sensor)
+        # === 연결 설정 패널 ===
+        connection_panel = self._create_connection_panel()
+        left_panel_layout.addWidget(connection_panel)
         
         ## 상단 온도 통합 레이아웃
         temp_grid_layout = QGridLayout()
@@ -320,8 +372,6 @@ class OutputModule(QWidget):
         self.etc_label = QLabel("기타: N/A")
         self.etc_label.setProperty("class", "TitleLabel")
         
-        self.anomaly_count_label = QLabel(f"이상 감지: {self.anomaly_count} 회")
-        self.anomaly_count_label.setObjectName("AnomalyCountLabel")
 
         fire_layout, self.fire_indicator = self._create_status_row("화재 감지")
         smoke_layout, self.smoke_indicator = self._create_status_row("연기 감지")
@@ -358,45 +408,71 @@ class OutputModule(QWidget):
         self.humidity_label = QLabel("습도: 55.0%")
         self.humidity_label.setProperty("class", "InfoLabel")
         
+        #### ---------------------로그 출력--------------------- ###
+        
+        self.log_layout = QGridLayout()
+        log_label = QLabel("최신 이상 감지")
+        log_clear_button = QPushButton("clear")
+
+        self.log_text_panel = QTextBrowser()
+        self.log_text_panel.setFixedHeight(30)
+        self.log_text_panel.setStyleSheet(""" background-color:black """)
+        
+        log_clear_button.clicked.connect(self.log_text_panel.clear)
+        
+        log_open_button = QPushButton("이상 감지 정보 자세히 보기")
+        log_open_button.clicked.connect(self.open_log_file)
+
+        self.log_layout.addWidget(log_label, 0, 0)
+        self.log_layout.addWidget(log_clear_button, 0, 1)
+        self.log_layout.addWidget(log_open_button, 0, 2)
+        self.log_layout.addWidget(self.log_text_panel, 1, 0, 1, 3)
+        
+                
+        ##### -------------------- 조작부 ---------------------- ###
+        
+        
+        ## 설정부 통합 레이아웃
+        self.config_layout = QVBoxLayout()
+        
+        # === 센서 위치 설정 ===
+        position_layout = QHBoxLayout()
+        
+        # 라디오 버튼 그룹 생성 (상호 배타적 선택 보장)
+        self.posi_label = QLabel("센서 위치: ", self)
+        self.position_button_group = QButtonGroup(self)
+        self.posi_center_sensor = QRadioButton("중앙", self)
+        self.posi_corner_sensor = QRadioButton("모서리", self)
+
+        self.position_button_group.addButton(self.posi_center_sensor, 0)
+        self.position_button_group.addButton(self.posi_corner_sensor, 1)
+        
+        # 기본 선택 (모서리)
+        self.posi_corner_sensor.setChecked(True)
+        
+        # 시그널 연결
+        self.posi_center_sensor.toggled.connect(self.position_toggled)
+        self.posi_corner_sensor.toggled.connect(self.position_toggled)
+        
+        position_layout.addWidget(self.posi_label)
+        position_layout.addWidget(self.posi_center_sensor)
+        position_layout.addWidget(self.posi_corner_sensor)
+        
+        
         # -- 온도 표시 위젯 --
+        display_filter_layout = QHBoxLayout()
+        
+        display_label = QLabel("온도 필터: ")
         display_degree = QCheckBox("온도 표시", self)
         display_degree.stateChanged.connect(self.display_degree_control)
         display_degree.setChecked(True)  # 기본값 설정
         display_degree_over_avg = QCheckBox("평균이상만", self)
         display_degree_over_avg.stateChanged.connect(self.display_degree_over_avg_control)
         display_degree_over_avg.setChecked(False)  # 기본값 설정
-                
-        # --- 히트맵 온도 범위 조절 위젯 ---
-        temp_range_layout = QGridLayout()
         
-        temp_range_title = QLabel("히트맵 온도 범위")
-        temp_range_title.setProperty("class", "TitleLabel")
-        
-        self.filter_label = QLabel("필터 온도: N/A")
-        self.filter_label.setProperty("class", "TitleLabel")
-            
-        # 최저 온도 조절 UI
-        min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
-        # 최고 온도 조절 UI
-        max_temp_layout, self.max_temp_spinbox = self._create_temp_control_row("최고", self.max_temp)
-        
-        # 필터링 적용 온도 조절 UI
-        filter_temp_layout, self.filter_temp_spinbox = self._create_temp_control_row("기준", self.filter_temp_add)
-        
-        # Signal 연결 - detector에 파라미터 업데이트 전송
-        self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
-        self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
-        self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
-        
-        temp_range_layout.addWidget(temp_range_title, 1, 0)
-        temp_range_layout.addWidget(self.filter_label, 2, 0)
-        temp_range_layout.addLayout(min_temp_layout, 0, 1)
-        temp_range_layout.addLayout(max_temp_layout, 1, 1)
-        temp_range_layout.addLayout(filter_temp_layout, 2, 1)
-        
-        # 가중치 조절 UI 레이아웃 생성
-        self.weight_grid_layout = QGridLayout()
-        self._create_weight_controls()
+        display_filter_layout.addWidget(display_label)
+        display_filter_layout.addWidget(display_degree)
+        display_filter_layout.addWidget(display_degree_over_avg)
         
         # --- 그리드 크기 조절 위젯 ---
         grid_size_group_box = QWidget()
@@ -426,30 +502,64 @@ class OutputModule(QWidget):
         grid_size_up_layout.addWidget(self.grid_size_spinbox)
 
         grid_size_layout.addLayout(grid_size_up_layout)
+        
+                        
+        # --- 히트맵 온도 범위 조절 위젯 ---
+        temp_range_layout = QGridLayout()
+        
+        temp_range_title = QLabel("히트맵 온도 범위")
+        temp_range_title.setProperty("class", "TitleLabel")
+        
+        self.filter_label = QLabel("필터 온도: N/A")
+        self.filter_label.setProperty("class", "TitleLabel")
+            
+        # 최저 온도 조절 UI
+        min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
+        # 최고 온도 조절 UI
+        max_temp_layout, self.max_temp_spinbox = self._create_temp_control_row("최고", self.max_temp)
+        
+        # 필터링 적용 온도 조절 UI
+        filter_temp_layout, self.filter_temp_spinbox = self._create_temp_control_row("기준", self.filter_temp_add)
+        
+        # Signal 연결 - detector에 파라미터 업데이트 전송
+        self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
+        self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
+        self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
+        
+        temp_range_layout.addWidget(temp_range_title, 0, 0, 1, 1)
+        temp_range_layout.addWidget(self.filter_label, 1, 0, 2, 1)
+        temp_range_layout.addLayout(min_temp_layout, 0, 1)
+        temp_range_layout.addLayout(max_temp_layout, 0, 2)
+        temp_range_layout.addLayout(filter_temp_layout, 1, 2)
+        
+        # 가중치 조절 UI 레이아웃 생성
+        self.weight_grid_layout = QGridLayout()
+        self._create_weight_controls()
 
-        self.log_button = QPushButton("이상 감지 정보 자세히 보기")
-        self.log_button.clicked.connect(self.open_log_file)
-
+        # config layout에 위젯들 추가        
+        self.config_layout.addLayout(position_layout)
+        self.config_layout.addLayout(display_filter_layout)
+        self.config_layout.addWidget(grid_size_group_box)
+        self.config_layout.addLayout(temp_range_layout)
+        self.config_layout.addLayout(self.weight_grid_layout)
+        
+        
         self.time_label = QLabel("시간: N/A")
         self.time_label.setFont(QFont("Arial", 9))
 
         # left_panel_layout에 위젯들 추가
-        left_panel_layout.addLayout(position_layout)
+        
         left_panel_layout.addLayout(temp_grid_layout)
         left_panel_layout.addWidget(self.etc_label)
-        left_panel_layout.addWidget(self.anomaly_count_label)
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
-        left_panel_layout.addWidget(self.object_detection_label)
+        
         left_panel_layout.addWidget(self.suspect_fire_label)
         left_panel_layout.addLayout(heat_source_grid)
-        left_panel_layout.addWidget(display_degree)
-        left_panel_layout.addWidget(display_degree_over_avg)
-        left_panel_layout.addLayout(temp_range_layout)
-        left_panel_layout.addLayout(self.weight_grid_layout)
-        left_panel_layout.addWidget(grid_size_group_box)
+        left_panel_layout.addLayout(self.log_layout)
+        left_panel_layout.addLayout(self.config_layout)
+
         left_panel_layout.addStretch(1)
-        left_panel_layout.addWidget(self.log_button)
         left_panel_layout.addWidget(self.time_label)
 
         main_layout.addWidget(left_panel, 0, 0, 2, 1)
@@ -465,6 +575,127 @@ class OutputModule(QWidget):
         main_layout.setColumnStretch(1, 1)
         main_layout.setRowStretch(0, 1)
     
+    def _create_connection_panel(self):
+        """연결 설정 패널 생성"""
+        connection_panel = QGroupBox("연결 설정")
+        connection_panel.setObjectName("ConnectionPanel")
+        connection_panel.setProperty("connected", "false")
+        
+        layout = QVBoxLayout(connection_panel)
+        
+        # 포트 및 보드레이트 설정 레이아웃
+        settings_layout = QHBoxLayout()
+        
+        # 포트 선택
+        port_label = QLabel("포트:")
+        port_label.setProperty("class", "InfoLabel")
+        
+        self.port_combo = QComboBox()
+        self.port_combo.addItems(["COM3", "COM4", "COM5", "COM6", "COM7", "COM8"])
+        self.port_combo.setCurrentText("COM3")
+        self.port_combo.setStyleSheet(""" background-color:black """)
+        
+        
+        # 보드레이트 선택
+        baudrate_label = QLabel("보드레이트:")
+        baudrate_label.setProperty("class", "InfoLabel")
+        
+        self.baudrate_combo = QComboBox()
+        self.baudrate_combo.addItems(["38400", "57600", "115200"])
+        self.baudrate_combo.setCurrentText("57600")
+        self.baudrate_combo.setStyleSheet(""" background-color:black """)
+        
+        settings_layout.addWidget(port_label)
+        settings_layout.addWidget(self.port_combo)
+        settings_layout.addWidget(baudrate_label)
+        settings_layout.addWidget(self.baudrate_combo)
+        settings_layout.addStretch()
+        
+        # 연결 상태 및 버튼 레이아웃
+        connection_layout = QHBoxLayout()
+        
+        self.connection_status_label = QLabel("연결 안됨")
+        self.connection_status_label.setProperty("class", "ConnectionLabel")
+        
+        self.connect_button = QPushButton("연결")
+        self.connect_button.setProperty("buttonType", "connect")
+        self.connect_button.clicked.connect(self.on_connect_clicked)
+        
+        self.disconnect_button = QPushButton("연결 해제")
+        self.disconnect_button.setProperty("buttonType", "disconnect")
+        self.disconnect_button.clicked.connect(self.on_disconnect_clicked)
+        self.disconnect_button.setEnabled(False)
+        
+        connection_layout.addWidget(self.connection_status_label)
+        connection_layout.addStretch()
+        connection_layout.addWidget(self.connect_button)
+        connection_layout.addWidget(self.disconnect_button)
+        
+        layout.addLayout(settings_layout)
+        layout.addLayout(connection_layout)
+        
+        return connection_panel
+    
+    def on_connect_clicked(self):
+        """연결 버튼 클릭 시 호출"""
+        port = self.port_combo.currentText()
+        baudrate = int(self.baudrate_combo.currentText())
+        
+        print(f"연결 요청: {port}, {baudrate}")
+        
+        # 포트 변경 시그널 발송
+        port_info = {
+            'port': port,
+            'baudrate': baudrate
+        }
+        self.data_signal.port_change_signal.emit(port_info)
+        
+        # UI 상태 업데이트 (임시)
+        self.connect_button.setEnabled(False)
+        self.connection_status_label.setText(f"연결 중... ({port})")
+    
+    def on_disconnect_clicked(self):
+        """연결 해제 버튼 클릭 시 호출"""
+        print("연결 해제 요청")
+        
+        # 빈 포트 정보로 연결 해제 시그널 발송
+        port_info = {
+            'port': '',
+            'baudrate': 0
+        }
+        self.data_signal.port_change_signal.emit(port_info)
+    
+    def update_connection_status(self, connected, port, error_msg=""):
+        """연결 상태 업데이트 (외부에서 호출)"""
+        self.is_connected = connected
+        self.current_port = port if connected else ""
+        if self.current_port == '':
+            connected = False
+        
+        # UI 상태 업데이트
+        connection_panel = self.findChild(QGroupBox, "ConnectionPanel")
+        if connection_panel:
+            connection_panel.setProperty("connected", "true" if connected else "false")
+            connection_panel.style().unpolish(connection_panel)
+            connection_panel.style().polish(connection_panel)
+        
+        if connected:
+            self.connection_status_label.setText(f"연결됨: {port}")
+            self.connect_button.setEnabled(False)
+            self.disconnect_button.setEnabled(True)
+            self.port_combo.setEnabled(False)
+            self.baudrate_combo.setEnabled(False)
+        else:
+            if error_msg:
+                self.connection_status_label.setText(f"연결 실패: {error_msg}")
+            else:
+                self.connection_status_label.setText("연결 안됨")
+            self.connect_button.setEnabled(True)
+            self.disconnect_button.setEnabled(False)
+            self.port_combo.setEnabled(True)
+            self.baudrate_combo.setEnabled(True)
+        
+        
     def _create_weight_controls(self):
         """센서 위치에 따른 가중치 조절 UI 생성"""
         # 기존 가중치 UI 제거
@@ -479,6 +710,8 @@ class OutputModule(QWidget):
             num_weights = 8
         
         # 새로운 가중치 UI 생성
+        self.weight_label = QLabel("가중치 \n컨트롤")
+        self.weight_grid_layout.addWidget(self.weight_label, 0, 0, 1, num_weights)
         self.weight_layouts = []
         self.weight_spinboxes = []
         
@@ -498,7 +731,7 @@ class OutputModule(QWidget):
             # 그리드 레이아웃에 추가
             row = i // 2
             col = i % 2
-            self.weight_grid_layout.addLayout(layout, row, col)
+            self.weight_grid_layout.addLayout(layout, row, col+1)
     
     def _clear_weight_controls(self):
         """기존 가중치 UI 요소들 제거"""
@@ -752,6 +985,8 @@ class OutputModule(QWidget):
         heat_source_dict = data_package.get('heat_source_dict', {})        
         suspect_fire = data_package.get('suspect_fire', [])        
         
+        total_log = data_package.get('total_log', 'N/A')        
+        
         # 그리드 크기 업데이트 (detector에서 처리된 크기)
         detector_grid_size = data_package.get('interpolated_grid_size', self.interpolated_grid_size)
         if detector_grid_size != self.interpolated_grid_size:
@@ -775,6 +1010,7 @@ class OutputModule(QWidget):
             self.suspect_fire_label.setText(f"의심 열원: {suspect_fire}")
             self.filter_label.setText(f"필터 온도: {filter_temp:.1f}°C")
             
+            self.log_text_panel.setText(total_log)
             # heat source 정보 업데이트
             if heat_source_dict:
                 if heat_source_dict.get('safety', 'N/A') is not None:
@@ -908,7 +1144,7 @@ class OutputModule(QWidget):
 
         return QColor(r, g, b)
 
-# 실제 센서 데이터를 생성하고 큐에 넣는 역할을 하는 스레드
+# 실제 센서 데이터를 생성하고 큐에 넣는 역할을 하는 스레드 (테스트용)
 class DataGeneratorThread(QThread):
     def __init__(self, data_queue, data_signal_obj):
         super().__init__()
