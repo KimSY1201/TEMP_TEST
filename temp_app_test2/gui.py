@@ -1,10 +1,12 @@
-""" 
-250804 리팩토링 완료:
+"""  250804 리팩토링 완료:
 - 열원 필터링, 가중치 적용, 보간 처리를 detector에서 수행
 - GUI는 처리된 데이터를 받아서 표시만 담당
 - 파라미터 변경 시 detector에 업데이트 신호 전송
 - 센서 위치 변경 시 가중치 UI 동적 업데이트 추가
 
+"""
+
+""" 250807 평균온도 필터링 추가
 """
 
 import sys
@@ -243,6 +245,7 @@ class OutputModule(QWidget):
 
         # == 온도 출력 on off == 
         self.display_degree = True
+        self.display_degree_over_avg = False
         
         # 가중치 UI 관련 변수들
         self.weight_grid_layout = None
@@ -326,6 +329,9 @@ class OutputModule(QWidget):
         self.object_detection_label = QLabel("객체: N/A")
         self.object_detection_label.setProperty("class", "TitleLabel")
         
+        self.suspect_fire_label = QLabel("의심 열원: N/A")
+        self.suspect_fire_label.setProperty("class", "TitleLabel")
+        
         heat_source_grid = QGridLayout()
         safety_label = QLabel("safety")
         safety_label.setProperty("class", "TitleLabel")
@@ -348,9 +354,6 @@ class OutputModule(QWidget):
         heat_source_grid.addWidget(self.safety_label, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter )
         heat_source_grid.addWidget(self.caution_label, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter )
         heat_source_grid.addWidget(self.danger_label, 1, 2, alignment=Qt.AlignmentFlag.AlignCenter )
-        
-        self.test_label = QLabel("test: N/A")
-        self.test_label.setProperty("class", "TitleLabel")
 
         self.humidity_label = QLabel("습도: 55.0%")
         self.humidity_label.setProperty("class", "InfoLabel")
@@ -359,15 +362,19 @@ class OutputModule(QWidget):
         display_degree = QCheckBox("온도 표시", self)
         display_degree.stateChanged.connect(self.display_degree_control)
         display_degree.setChecked(True)  # 기본값 설정
+        display_degree_over_avg = QCheckBox("평균이상만", self)
+        display_degree_over_avg.stateChanged.connect(self.display_degree_over_avg_control)
+        display_degree_over_avg.setChecked(False)  # 기본값 설정
                 
         # --- 히트맵 온도 범위 조절 위젯 ---
-        temp_range_group_box = QWidget()
-        temp_range_group_box.setObjectName("TopPanel")
-        temp_range_layout = QVBoxLayout(temp_range_group_box)
+        temp_range_layout = QGridLayout()
         
         temp_range_title = QLabel("히트맵 온도 범위")
         temp_range_title.setProperty("class", "TitleLabel")
         
+        self.filter_label = QLabel("필터 온도: N/A")
+        self.filter_label.setProperty("class", "TitleLabel")
+            
         # 최저 온도 조절 UI
         min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
         # 최고 온도 조절 UI
@@ -381,10 +388,11 @@ class OutputModule(QWidget):
         self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
         self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
         
-        temp_range_layout.addWidget(temp_range_title)
-        temp_range_layout.addLayout(min_temp_layout)
-        temp_range_layout.addLayout(max_temp_layout)
-        temp_range_layout.addLayout(filter_temp_layout)
+        temp_range_layout.addWidget(temp_range_title, 1, 0)
+        temp_range_layout.addWidget(self.filter_label, 2, 0)
+        temp_range_layout.addLayout(min_temp_layout, 0, 1)
+        temp_range_layout.addLayout(max_temp_layout, 1, 1)
+        temp_range_layout.addLayout(filter_temp_layout, 2, 1)
         
         # 가중치 조절 UI 레이아웃 생성
         self.weight_grid_layout = QGridLayout()
@@ -433,10 +441,11 @@ class OutputModule(QWidget):
         left_panel_layout.addLayout(fire_layout)
         left_panel_layout.addLayout(smoke_layout)
         left_panel_layout.addWidget(self.object_detection_label)
+        left_panel_layout.addWidget(self.suspect_fire_label)
         left_panel_layout.addLayout(heat_source_grid)
-        left_panel_layout.addWidget(self.test_label)
         left_panel_layout.addWidget(display_degree)
-        left_panel_layout.addWidget(temp_range_group_box)
+        left_panel_layout.addWidget(display_degree_over_avg)
+        left_panel_layout.addLayout(temp_range_layout)
         left_panel_layout.addLayout(self.weight_grid_layout)
         left_panel_layout.addWidget(grid_size_group_box)
         left_panel_layout.addStretch(1)
@@ -529,12 +538,23 @@ class OutputModule(QWidget):
         # detector에 센서 위치 업데이트 전송
         params = {
             'sensor_position': self.sensor_position,
-        }
+        } 
         self.data_signal.parameter_update_signal.emit(params)
     
     def display_degree_control(self, state):
         """온도 표시 체크박스 제어"""
         self.display_degree = bool(state)
+        
+        # 현재 데이터로 히트맵 다시 업데이트 (온도 표시 여부 적용)
+        if self.current_data_package:
+            processed_values = self.current_data_package.get('processed_values', [])
+            if processed_values:
+                self.update_heatmap(processed_values)
+        
+    def display_degree_over_avg_control(self, state):
+        """평균이상만 표시 체크박스 제어"""
+        self.display_degree_over_avg = bool(state)
+        print('display_degree_over_avg_control', state)
         
         # 현재 데이터로 히트맵 다시 업데이트 (온도 표시 여부 적용)
         if self.current_data_package:
@@ -730,6 +750,7 @@ class OutputModule(QWidget):
         
         # heat source dict
         heat_source_dict = data_package.get('heat_source_dict', {})        
+        suspect_fire = data_package.get('suspect_fire', [])        
         
         # 그리드 크기 업데이트 (detector에서 처리된 크기)
         detector_grid_size = data_package.get('interpolated_grid_size', self.interpolated_grid_size)
@@ -748,13 +769,20 @@ class OutputModule(QWidget):
             self.sensor_temp_label.setText(f"{sensor_degree:.1f}°C")
             self.max_temp_label.setText(f"{max_temp:.1f}°C")
             self.avg_temp_label.setText(f"{avg_temp:.1f}°C")
+            self.avg_temp = avg_temp
             self.etc_label.setText(f"기타: {etc}")
             self.object_detection_label.setText(f"객체: {object_detection}")
-            self.test_label.setText(f"필터 온도: {filter_temp:.1f}°C")
+            self.suspect_fire_label.setText(f"의심 열원: {suspect_fire}")
+            self.filter_label.setText(f"필터 온도: {filter_temp:.1f}°C")
             
             # heat source 정보 업데이트
             if heat_source_dict:
-                self.safety_label.setText(str(heat_source_dict.get('safety', 'N/A')))
+                if heat_source_dict.get('safety', 'N/A') is not None:
+                    safety_text = heat_source_dict.get('safety', 'N/A')
+                else:
+                    safety_text = 'None'
+                
+                self.safety_label.setText(str(safety_text))
                 self.caution_label.setText(str(heat_source_dict.get('caution', 'N/A')))
                 self.danger_label.setText(str(heat_source_dict.get('danger', 'N/A')))
             
@@ -820,8 +848,13 @@ class OutputModule(QWidget):
                 color = self.get_color_from_value(value)
                 cell = self.grid_cells[i][j]
                 
+                if self.display_degree_over_avg:
+                    # value = value - self.avg_temp 
+                    value = 0 if value - (self.avg_temp+2)  < 0 else value                        
+                    # print(value)    
                 # 셀 텍스트 업데이트 (온도 표시 여부에 따라)
                 cell.setText(f"{value:.1f}" if self.display_degree else "")
+                
                 
                 # 셀 스타일 업데이트
                 cell.setStyleSheet(f"background-color: {color.name()}; color:black; font-weight: bold; font-size: {self.font_size}px; border: none;")

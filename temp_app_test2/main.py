@@ -52,6 +52,7 @@ if __name__ == '__main__':
     # COM 포트와 보드레이트는 실제 환경에 맞게 조절하세요.
     # receiver = ReceiverModule(output_queue, detection_queue, port='COM4', baudrate=38400)
     receiver = ReceiverModule(detection_queue, port='COM3', baudrate=57600)
+    # receiver = ReceiverModule(detection_queue, port='COM3', baudrate=38400)
     receiver.start()
 
     # 2. 출력 모듈 (GUI) 인스턴스 생성 및 표시

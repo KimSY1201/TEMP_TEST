@@ -64,39 +64,75 @@ class ReceiverModule(threading.Thread):
                             self.current_values_buffer.append(value)
                             # print(f"ReceiverModule: 값 수신 - 현재 버퍼 크기: {len(self.current_values_buffer)}")
 
-                            if len(self.current_values_buffer) == 67:
-                                # 센서 주변 온도값 1 + 64개값 + 불명 2개값
-                                # 64개의 값이 모두 모이면 패키지 완성
-                                sensor_degree = self.current_values_buffer[0]
-                                received_values = self.current_values_buffer[1:65] # 현재 버퍼 복사
-                                etc_values = self.current_values_buffer[65:] 
-                                self.current_values_buffer = [] # 버퍼 초기화 (다음 MOD를 위해)
-                                self.expecting_data = False     # 다음 'MOD'를 기다림
+                            if self.baudrate == 38400:
+                                if len(self.current_values_buffer) == 65:
+                                    # 센서 주변 온도값 1 + 64개값 + 불명 2개값
+                                    # 64개의 값이 모두 모이면 패키지 완성
+                                    sensor_degree = self.current_values_buffer[0]
+                                    received_values = self.current_values_buffer[1:65] # 현재 버퍼 복사
+                                    etc_values = [0,0] 
+                                    self.current_values_buffer = [] # 버퍼 초기화 (다음 MOD를 위해)
+                                    self.expecting_data = False     # 다음 'MOD'를 기다림
+                                    
+                                    # 완성된 패키지를 큐에 전달
+                                    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                    
+                                    data_package = {'sensor_degree': sensor_degree, 'time': current_time, 'values': received_values, 'etc': etc_values}
+                                    # self.output_queue.put(data_package)
+                                    # 디텍터로 보낸다음 디턱터에서 다시 보냄.
+                                    self.detection_queue.put(data_package)
+                                    # print(f"ReceiverModule: 64개 값 패키지 완성 및 큐에 추가. 첫 5개 값: {received_values[:5]}")
+                                    
+                                    cwd = os.getcwd().replace('\\', '/')
+                                    PATH = f"{cwd}/_data/degree_test.csv"
+                                    # print('here')
+                                    if not os.path.exists(PATH):
+                                        write_type = 'w'
+                                    else:
+                                        write_type = 'a'
+                                    
+                                    with open(PATH, write_type , newline='') as csvfile:
+                                            csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                                            result = [datetime.now(), sensor_degree]
+                                            result.extend(received_values)
+                                            # print(result)
+                                            csv_writer.writerow(result)
                                 
-                                # 완성된 패키지를 큐에 전달
-                                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                                
-                                data_package = {'sensor_degree': sensor_degree, 'time': current_time, 'values': received_values, 'etc': etc_values}
-                                # self.output_queue.put(data_package)
-                                # 디텍터로 보낸다음 디턱터에서 다시 보냄.
-                                self.detection_queue.put(data_package)
-                                # print(f"ReceiverModule: 64개 값 패키지 완성 및 큐에 추가. 첫 5개 값: {received_values[:5]}")
-                                
-                                cwd = os.getcwd().replace('\\', '/')
-                                PATH = f"{cwd}/_data/degree_test.csv"
-                                # print('here')
-                                if not os.path.exists(PATH):
-                                    write_type = 'w'
-                                else:
-                                    write_type = 'a'
-                                
-                                with open(PATH, write_type , newline='') as csvfile:
-                                        csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                                        result = [datetime.now(), sensor_degree]
-                                        result.extend(received_values)
-                                        # print(result)
-                                        csv_writer.writerow(result)
-                                        
+                            
+                            else:
+                                if len(self.current_values_buffer) == 67:
+                                    # 센서 주변 온도값 1 + 64개값 + 불명 2개값
+                                    # 64개의 값이 모두 모이면 패키지 완성
+                                    sensor_degree = self.current_values_buffer[0]
+                                    received_values = self.current_values_buffer[1:65] # 현재 버퍼 복사
+                                    etc_values = self.current_values_buffer[65:] 
+                                    self.current_values_buffer = [] # 버퍼 초기화 (다음 MOD를 위해)
+                                    self.expecting_data = False     # 다음 'MOD'를 기다림
+                                    
+                                    # 완성된 패키지를 큐에 전달
+                                    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                    
+                                    data_package = {'sensor_degree': sensor_degree, 'time': current_time, 'values': received_values, 'etc': etc_values}
+                                    # self.output_queue.put(data_package)
+                                    # 디텍터로 보낸다음 디턱터에서 다시 보냄.
+                                    self.detection_queue.put(data_package)
+                                    # print(f"ReceiverModule: 64개 값 패키지 완성 및 큐에 추가. 첫 5개 값: {received_values[:5]}")
+                                    
+                                    cwd = os.getcwd().replace('\\', '/')
+                                    PATH = f"{cwd}/_data/degree_test.csv"
+                                    # print('here')
+                                    if not os.path.exists(PATH):
+                                        write_type = 'w'
+                                    else:
+                                        write_type = 'a'
+                                    
+                                    with open(PATH, write_type , newline='') as csvfile:
+                                            csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                                            result = [datetime.now(), sensor_degree]
+                                            result.extend(received_values)
+                                            # print(result)
+                                            csv_writer.writerow(result)
+                                            
                                     
                                     
                         except ValueError:
@@ -113,7 +149,7 @@ class ReceiverModule(threading.Thread):
                     time.sleep(0.01)
 
             except serial.SerialTimeoutException:
-                # print("ReceiverModule: 시리얼 읽기 타임아웃.") # 너무 자주 출력될 수 있으니 주석 처리
+                print("ReceiverModule: 시리얼 읽기 타임아웃.") # 너무 자주 출력될 수 있으니 주석 처리
                 pass # 타임아웃은 흔한 일이라 따로 처리하지 않을 수 있습니다.
             except serial.SerialException as e:
                 print(f"ReceiverModule: 시리얼 통신 오류 발생: {e}")
