@@ -77,7 +77,7 @@ QWidget {
 
 /* 제목 레이블 스타일 */
 QLabel[class="TitleLabel"] {
-    font-size: 16px;
+    font-size: 16pt;
     font-weight: bold;
     color: #FFFFFF;
     padding: 2px;
@@ -85,7 +85,7 @@ QLabel[class="TitleLabel"] {
 
 /* 일반 정보 레이블 스타일 */
 QLabel[class="InfoLabel"] {
-    font-size: 14px;
+    font-size: 14pt;
     font-weight: bold;
 }
 
@@ -209,18 +209,13 @@ QLabel[styleClass="Indicator"][state="detected"] {
                 
                 
 #safety {
-    background-color: green;
-    
+    border: 3px solid green;
 }
 #caution {
-    background-color: yellow;
-    font-size: 14px;
-    color: black;
+    border: 3px solid yellow;
 }
 #danger {
-    background-color: red;
-    font-size: 14px;
-    color: black;
+    border: 3px solid red;
 }
 
 
@@ -398,7 +393,7 @@ class OutputModule(QWidget):
 
         fs_detect_widget = QWidget()
         fs_detect_widget.setProperty('class','Panel')
-        fs_layout = QVBoxLayout(fs_detect_widget)
+        fs_layout = QHBoxLayout(fs_detect_widget)
         
         fire_layout, self.fire_indicator = self._create_status_row("화재 감지")
         smoke_layout, self.smoke_indicator = self._create_status_row("연기 감지")
@@ -415,6 +410,7 @@ class OutputModule(QWidget):
         
         self.suspect_fire_label = QLabel("의심 열원: N/A")
         self.suspect_fire_label.setProperty("class", "Panel")
+        
         
         heat_source_widget = QWidget()
         heat_source_widget.setProperty("class", "Panel")
@@ -444,6 +440,8 @@ class OutputModule(QWidget):
         self.log_widget.setProperty("class","Panel")
         self.log_layout = QGridLayout(self.log_widget)
         log_label = QLabel("최신 이상 감지")
+        log_label.setProperty("class", "InfoLabel")
+        
         log_clear_button = QPushButton("clear")
 
         self.log_text_panel = QTextBrowser()
@@ -479,6 +477,7 @@ class OutputModule(QWidget):
         display_filter_layout = QHBoxLayout()
         
         display_label = QLabel("온도 필터: ")
+        display_label.setProperty("class", "InfoLabel")
         display_degree = QCheckBox("온도 표시", self)
         display_degree.stateChanged.connect(self.display_degree_control)
         display_degree.setChecked(True)  # 기본값 설정
@@ -497,6 +496,7 @@ class OutputModule(QWidget):
         grid_size_up_layout = QHBoxLayout()
 
         self.grid_label_prefix = QLabel("그리드 해상도:")
+        self.grid_label_prefix.setProperty("class", "InfoLabel")
         # self.grid_label_prefix.setProperty("class", "TitleLabel")
 
         self.grid_size_spinbox = QSpinBox()
@@ -506,12 +506,6 @@ class OutputModule(QWidget):
         self.grid_size_spinbox.valueChanged.connect(self._update_grid_size_from_spinbox)
         self.grid_size_spinbox.setStyleSheet(f"background-color:black")
         self.grid_size_spinbox.setFont(QFont("Arial", 12))
-
-        self.grid_size_slider = QSlider(Qt.Orientation.Horizontal)
-        self.grid_size_slider.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8)
-        self.grid_size_slider.setSingleStep(self.ORIGINAL_GRID_SIZE)
-        self.grid_size_slider.setValue(self.interpolated_grid_size)
-        self.grid_size_slider.valueChanged.connect(self._update_grid_size_from_slider)
 
         grid_size_up_layout.addWidget(self.grid_label_prefix)
         grid_size_up_layout.addStretch(1)
@@ -563,6 +557,7 @@ class OutputModule(QWidget):
         
         # 라디오 버튼 그룹 생성 (상호 배타적 선택 보장)
         self.posi_label = QLabel("센서 위치: ", self)
+        self.posi_label.setProperty("class", "InfoLabel")
         self.position_button_group = QButtonGroup(self)
         self.posi_center_sensor = QRadioButton("중앙", self)
         self.posi_corner_sensor = QRadioButton("모서리", self)
@@ -804,7 +799,8 @@ class OutputModule(QWidget):
             num_weights = 8
         
         # 새로운 가중치 UI 생성
-        self.weight_label = QLabel("가중치 \n컨트롤")
+        self.weight_label = QLabel("가중치")
+        self.weight_label.setProperty("class", "InfoLabel")
         self.weight_grid_layout.addWidget(self.weight_label, 0, 0, 1, num_weights)
         self.weight_layouts = []
         self.weight_spinboxes = []
@@ -1052,9 +1048,11 @@ class OutputModule(QWidget):
         indicator = QLabel()
         indicator.setProperty("styleClass", "Indicator")
         indicator.setProperty("state", "stable")
+        indicator.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(label)
-        layout.addStretch(1)
+        
         layout.addWidget(indicator)
+        layout.addStretch(1)
         return layout, indicator
 
     def update_display(self, data_package):

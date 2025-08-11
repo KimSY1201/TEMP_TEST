@@ -158,6 +158,8 @@ class DetectionModule(threading.Thread):
             self.filter_temp_add = params['filter_temp_add']
         if 'weight_list' in params:
             self.weight_list = params['weight_list']
+        if 'weight_list_corner' in params:
+            self.weight_list_corner = params['weight_list_corner']
         if 'interpolated_grid_size' in params:
             self.interpolated_grid_size = params['interpolated_grid_size']
     
@@ -418,24 +420,6 @@ class DetectionModule(threading.Thread):
             # 'high_temp_count': np.sum(original_values > self.filter_temp),
             # 'anomaly_regions': self.identify_anomaly_regions(original_values)
         }
-    
-    # def identify_anomaly_regions(self, values):
-    #     """
-    #     이상 온도 영역 식별
-    #     """
-    #     values_2d = np.array(values).reshape(8, 8)
-    #     anomaly_positions = []
-        
-    #     for i in range(8):
-    #         for j in range(8):
-    #             if values_2d[i, j] > self.fire_threshold_temp:
-    #                 anomaly_positions.append({
-    #                     'position': (i, j),
-    #                     'temperature': values_2d[i, j],
-    #                     'severity': 'high' if values_2d[i, j] > self.fire_threshold_temp + 5 else 'medium'
-    #                 })
-        
-    #     return anomaly_positions
     
     def run(self):
         while self.running:

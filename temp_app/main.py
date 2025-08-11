@@ -56,7 +56,7 @@ class ApplicationManager:
             self.detection_queue, 
             self.output_queue, 
             threshold=5.0, 
-            filename="current_dir/_data/detected_values.txt"
+            filename=f"{current_dir}/_data/detected_values.txt"
         )
         self.detection_module.start()
         
