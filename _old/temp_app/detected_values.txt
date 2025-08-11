@@ -1,0 +1,14 @@
+--- Detected at 2025-07-31 15:19:27 ---
+누적 이상 감지 횟수: 1회
+Overall Average: 26.55°C
+Detection Limit: 30.0°C
+- Position (2,0): 34.84°C (기준 30.0°C 초과)
+- Position (2,1): 46.03°C (기준 30.0°C 초과)
+- Position (2,2): 33.55°C (기준 30.0°C 초과)
+- Position (3,0): 48.26°C (기준 30.0°C 초과)
+- Position (3,1): 73.04°C (기준 30.0°C 초과)
+- Position (3,2): 46.13°C (기준 30.0°C 초과)
+- Position (4,0): 34.72°C (기준 30.0°C 초과)
+- Position (4,1): 46.14°C (기준 30.0°C 초과)
+- Position (4,2): 33.89°C (기준 30.0°C 초과)
+
