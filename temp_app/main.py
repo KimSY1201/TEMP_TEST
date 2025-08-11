@@ -2,6 +2,7 @@ import sys
 from queue import Queue
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer
+import os
 
 # 각 모듈 파일에서 필요한 클래스들을 import 합니다.
 from detector import DetectionModule
@@ -48,12 +49,14 @@ class ApplicationManager:
         print("감지 모듈 초기화 중...")
         
         # 감지 모듈 인스턴스 생성 및 시작
+        current_file_path = os.path.abspath(__file__)
+        current_dir = os.path.dirname(current_file_path)
         self.detection_module = DetectionModule(
             self.data_signal_obj, 
             self.detection_queue, 
             self.output_queue, 
             threshold=5.0, 
-            filename="detected_values.txt"
+            filename="current_dir/_data/detected_values.txt"
         )
         self.detection_module.start()
         

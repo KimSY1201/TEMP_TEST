@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -47,7 +48,7 @@ from sklearn.preprocessing import RobustScaler, MinMaxScaler
 """
 
 class DetectionModule(threading.Thread):
-    def __init__(self, data_signal_obj, detection_queue, output_queue, base_temperature=25.0, threshold=5.0, filename="detected_values.txt"):
+    def __init__(self, data_signal_obj, detection_queue, output_queue, base_temperature=25.0, threshold=5.0, filename="./temp_app/_data/detected_values.txt"):
         super().__init__()
         self.output_queue = output_queue
         self.detection_queue = detection_queue
@@ -84,6 +85,7 @@ class DetectionModule(threading.Thread):
         
         self.suspect_fire_coordinate = tuple()
         
+        self.total_log = ''
         # 5초간의 데이터 버퍼로 실제 화재인지 아닌지 판별
         # 추가적인 열원이 생겼을 때, 버퍼 저장 시작. 
         # 추가적인 열원이 계속 유지될 경우 화재로 간주.
@@ -102,11 +104,13 @@ class DetectionModule(threading.Thread):
         data_signal_obj.parameter_update_signal.connect(self.update_detection_parameters)
         
         # 모델 로드 시도
+        current_file_path = os.path.abspath(__file__)
+        current_dir = os.path.dirname(current_file_path)
         self.model = {}
-        self.model_path = {'rfm':'./temp_app_test2/_model/smv_rfm_model.joblib', 'lgbm': ''}
+        self.model_path = {'rfm':f'{current_dir}/_model/smv_rfm_model.joblib', 'lgbm': ''}
         self.load_model()
-        self.encoder = joblib.load('./temp_app_test2/_model/smv_label_en.joblib')
-        self.scaler = joblib.load('./temp_app_test2/_model/smv_mmx_sc.joblib')
+        self.encoder = joblib.load(f'{current_dir}/_model/smv_label_en.joblib')
+        self.scaler = joblib.load(f'{current_dir}/_model/smv_mmx_sc.joblib')
         
     
     def load_model(self):
@@ -339,8 +343,8 @@ class DetectionModule(threading.Thread):
                 fire_detected = is_fire
             else:
                 self.safety_high_temp_counter = self.high_temp_counter_init
-                self.safety_high_temp_dict['danger'] = 0
-                self.safety_high_temp_dict['caution'] = 0
+                self.safety_high_temp_dict['danger'] = tuple()
+                self.safety_high_temp_dict['caution'] = tuple()
                 self.safety_high_temp_dict['safety'] = last_coordinate
                 print(f"안전열원 갱신(확장) {len(self.safety_high_temp_dict['safety'])} {self.safety_high_temp_dict['safety']}")
             self.fire_detection_buffer2.clear()
@@ -352,7 +356,7 @@ class DetectionModule(threading.Thread):
 
             is_fire, last_coordinate = self.is_fire(deque=self.fire_detection_buffer)
             if is_fire :
-                print(f"열원 증가 감지 열원 좌표 {last_coordinate}")
+                # print(f"열원 증가 감지 열원 좌표 {last_coordinate}")
                 self.safety_high_temp_dict['caution'] = last_coordinate
             else:
                 self.safety_high_temp_counter = self.high_temp_counter_init
@@ -410,28 +414,28 @@ class DetectionModule(threading.Thread):
             'processed_max_temp': np.max(processed_values),
             'processed_avg_temp': np.mean(processed_values),
             'fire_detected': self.fire_detected,
-            'smoke_detected': self.smoke_detected,
-            'high_temp_count': np.sum(original_values > self.filter_temp),
-            'anomaly_regions': self.identify_anomaly_regions(original_values)
+            'smoke_detected': self.smoke_detected
+            # 'high_temp_count': np.sum(original_values > self.filter_temp),
+            # 'anomaly_regions': self.identify_anomaly_regions(original_values)
         }
     
-    def identify_anomaly_regions(self, values):
-        """
-        이상 온도 영역 식별
-        """
-        values_2d = np.array(values).reshape(8, 8)
-        anomaly_positions = []
+    # def identify_anomaly_regions(self, values):
+    #     """
+    #     이상 온도 영역 식별
+    #     """
+    #     values_2d = np.array(values).reshape(8, 8)
+    #     anomaly_positions = []
         
-        for i in range(8):
-            for j in range(8):
-                if values_2d[i, j] > self.fire_threshold_temp:
-                    anomaly_positions.append({
-                        'position': (i, j),
-                        'temperature': values_2d[i, j],
-                        'severity': 'high' if values_2d[i, j] > self.fire_threshold_temp + 5 else 'medium'
-                    })
+    #     for i in range(8):
+    #         for j in range(8):
+    #             if values_2d[i, j] > self.fire_threshold_temp:
+    #                 anomaly_positions.append({
+    #                     'position': (i, j),
+    #                     'temperature': values_2d[i, j],
+    #                     'severity': 'high' if values_2d[i, j] > self.fire_threshold_temp + 5 else 'medium'
+    #                 })
         
-        return anomaly_positions
+    #     return anomaly_positions
     
     def run(self):
         while self.running:
@@ -444,9 +448,7 @@ class DetectionModule(threading.Thread):
                     values = data_package['values']
 
                     if len(values) == 64:
-                        # 1. 원본 온도 처리
-                        self.process_values(current_time, values)
-                        
+                       
                         # 2. 머신러닝 객체 감지
                         object_detection = []
                         if self.is_model_loaded and 'rfm' in self.model:
@@ -468,6 +470,12 @@ class DetectionModule(threading.Thread):
                         # 5. 감지 통계 계산
                         detection_stats = self.calculate_detection_stats(values, interpolated_values)
                         
+                        # 이상 기록 저장
+                        if len(self.safety_high_temp_dict['caution']) or len(self.safety_high_temp_dict['danger']):
+                            self.log_anomaly(current_time, values)
+                        else:
+                            self.total_log = ''
+                        
                         # 6. 처리된 데이터 패키지 구성
                         data_package.update({
                             'object_detection': object_detection,
@@ -477,6 +485,7 @@ class DetectionModule(threading.Thread):
                             'fire_detected': self.fire_detected,
                             'smoke_detected': self.smoke_detected,
                             'anomaly_count': self.anomaly_total_count,
+                            'heat_source_dict': self.safety_high_temp_dict,
                             'processing_params': {
                                 'min_temp': self.min_temp,
                                 'max_temp': self.max_temp,
@@ -484,6 +493,9 @@ class DetectionModule(threading.Thread):
                                 'avg_temp': self.avg_temp
                             }
                         })
+                        
+                        
+                        
                         
                         # 7. GUI로 전달
                         self.process_data_package(data_package)
@@ -495,31 +507,24 @@ class DetectionModule(threading.Thread):
             else:
                 time.sleep(0.1)  # 큐가 비어있으면 잠시 대기
 
-    def process_values(self, current_time, values):
+    def log_anomaly(self, current_time, values):
         """기존 이상 감지 처리 (파일 로깅)"""
         values_array = np.array(values)
         average = np.mean(values_array)
-        detection_limit = self.base_temperature + self.threshold
-        
-        detected_high_values = []
-        for i, val in enumerate(values_array):
-            if val > detection_limit:
-                detected_high_values.append(f"Index {i}: {val:.2f} (감지 기준 {detection_limit:.1f}°C 초과)")
-        
-        if detected_high_values:
-            self.anomaly_total_count += 1
+        max = np.max(values_array)
+
+        if len(self.safety_high_temp_dict['danger']):
+            strength = 'danger'
+            # print(strength)
+        else:
+            strength = 'caution'
+            # print(2, strength)
+        # 파일에 누적 횟수도 함께 기록
+        self.total_log = f"{current_time[2:]} avg: {average:.2f}°C max: {max:.2f}°C 강도:{strength}\n" 
+        with open(self.filename, 'a', encoding='utf-8') as f:
+            f.write(self.total_log)
             
-            # # 파일에 누적 횟수도 함께 기록
-            # with open(self.filename, 'a', encoding='utf-8') as f:
-            #     f.write(f"--- Detected at {current_time} ---\n")
-            #     f.write(f"누적 이상 감지 횟수: {self.anomaly_total_count}회\n")
-            #     f.write(f"Overall Average: {average:.2f}°C\n")
-            #     for item in detected_high_values:
-            #         f.write(f"- {item}\n")
-            #     f.write("\n")
-                
-            # # print(f"Detected high values at {current_time}. Total detections: {self.anomaly_total_count}. Saved to {self.filename}")
-        
+            
     def process_data_package(self, data_package):
         """
         처리된 데이터 패키지를 GUI로 전달
@@ -551,7 +556,8 @@ class DetectionModule(threading.Thread):
             'interpolated_grid_size': data_package.get('interpolated_grid_size', 8),
             'processing_params': data_package.get('processing_params', {}),
             'suspect_fire': self.suspect_fire_coordinate,
-            'heat_source_dict': self.safety_high_temp_dict
+            'heat_source_dict': self.safety_high_temp_dict,
+            'total_log': self.total_log
         }
         
         # GUI 큐로 전달

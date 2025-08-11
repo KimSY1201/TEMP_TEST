@@ -24,7 +24,7 @@ from datetime import datetime
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton, QRadioButton,
                              QSlider, QSpinBox, QDoubleSpinBox, QCheckBox, QButtonGroup,
-                             QComboBox, QGroupBox, QFrame, QTextBrowser)
+                             QComboBox, QGroupBox, QFrame, QTextBrowser, QSizePolicy)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
 import queue
@@ -45,7 +45,7 @@ QWidget {
 
 /* 정보 패널(카드) 스타일 */
 #TopPanel, #LeftPanel {
-    background-color: #3C3C3C;
+    background-color: #080F25;
     border-radius: 8px;
     padding: 10px;
 }
@@ -68,6 +68,13 @@ QWidget {
     background-color: #4A2E2E;
 }
 
+.Panel {
+    background-color: #353535;
+    border-color: #F44336;
+    border-radius: 6px;
+    padding: 8px;
+}
+
 /* 제목 레이블 스타일 */
 QLabel[class="TitleLabel"] {
     font-size: 16px;
@@ -78,7 +85,7 @@ QLabel[class="TitleLabel"] {
 
 /* 일반 정보 레이블 스타일 */
 QLabel[class="InfoLabel"] {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
 }
 
@@ -192,7 +199,33 @@ QLabel[styleClass="Indicator"][state="detected"] {
                                      stop:0 rgba(255, 0, 0, 255),
                                      stop:1 rgba(128, 0, 0, 255));
 }
+
+.temp_widget { 
+                    background-color: #37446B;
+                    border: 1px solid #1D2439;
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    }
+                
+                
+#safety {
+    background-color: green;
+    
+}
+#caution {
+    background-color: yellow;
+    font-size: 14px;
+    color: black;
+}
+#danger {
+    background-color: red;
+    font-size: 14px;
+    color: black;
+}
+
+
 """
+
 
 class DataSignal(QObject):
     update_data_signal = pyqtSignal(dict)
@@ -346,71 +379,70 @@ class OutputModule(QWidget):
         left_panel_layout.addWidget(connection_panel)
         
         ## 상단 온도 통합 레이아웃
-        temp_grid_layout = QGridLayout()
-        sensor_label = QLabel("센서 온도")
-        sensor_label.setProperty("class", "TitleLabel")
-        max_label = QLabel("최고 온도")
-        max_label.setProperty("class", "TitleLabel")
-        min_label = QLabel("평균 온도")
-        min_label.setProperty("class", "TitleLabel")
+        temp_grid_widget = QWidget()        
+        temp_grid_widget.setProperty('class','Panel')
+        temp_grid_layout = QGridLayout(temp_grid_widget)
         
-        self.sensor_temp_label = QLabel("N/A")
-        self.sensor_temp_label.setProperty("class", "TitleLabel")
-        self.max_temp_label = QLabel("N/A")
-        self.max_temp_label.setProperty("class", "TitleLabel")
-        self.avg_temp_label = QLabel("N/A")
-        self.avg_temp_label.setProperty("class", "TitleLabel")
+        self.sensor_temp_widget, self.sensor_temp_label = self._create_temp_grid("센서", "")
+        self.max_temp_widget, self.max_temp_label = self._create_temp_grid("최고", "")
+        self.avg_temp_widget, self.avg_temp_label = self._create_temp_grid("평균", "")
         
-        temp_grid_layout.addWidget(sensor_label, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter )
-        temp_grid_layout.addWidget(max_label, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter )
-        temp_grid_layout.addWidget(min_label, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter )
-        
-        temp_grid_layout.addWidget(self.sensor_temp_label, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter )
-        temp_grid_layout.addWidget(self.max_temp_label, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter )
-        temp_grid_layout.addWidget(self.avg_temp_label, 1, 2, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(self.sensor_temp_widget, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(self.max_temp_widget, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(self.avg_temp_widget, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter )
         
         self.etc_label = QLabel("기타: N/A")
         self.etc_label.setProperty("class", "TitleLabel")
         
+        #--------------------------------------------------
 
+        fs_detect_widget = QWidget()
+        fs_detect_widget.setProperty('class','Panel')
+        fs_layout = QVBoxLayout(fs_detect_widget)
+        
         fire_layout, self.fire_indicator = self._create_status_row("화재 감지")
         smoke_layout, self.smoke_indicator = self._create_status_row("연기 감지")
+        
+        fs_layout.addLayout(fire_layout)
+        fs_layout.addLayout(smoke_layout)
+        
+        #--------------------------------------------------
         
         self.object_detection_label = QLabel("객체: N/A")
         self.object_detection_label.setProperty("class", "TitleLabel")
         
+        #--------------------------------------------------
+        
         self.suspect_fire_label = QLabel("의심 열원: N/A")
-        self.suspect_fire_label.setProperty("class", "TitleLabel")
+        self.suspect_fire_label.setProperty("class", "Panel")
         
-        heat_source_grid = QGridLayout()
-        safety_label = QLabel("safety")
-        safety_label.setProperty("class", "TitleLabel")
-        caution_label = QLabel("caution")
-        caution_label.setProperty("class", "TitleLabel")
-        danger_label = QLabel("danger")
-        danger_label.setProperty("class", "TitleLabel")
-        
-        self.safety_label = QLabel("N/A")
-        self.safety_label.setProperty("class", "TitleLabel")
-        self.caution_label = QLabel("N/A")
-        self.caution_label.setProperty("class", "TitleLabel")
-        self.danger_label = QLabel("N/A")
-        self.danger_label.setProperty("class", "TitleLabel")
-        
-        heat_source_grid.addWidget(safety_label, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter )
-        heat_source_grid.addWidget(caution_label, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter )
-        heat_source_grid.addWidget(danger_label, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter )
-        
-        heat_source_grid.addWidget(self.safety_label, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter )
-        heat_source_grid.addWidget(self.caution_label, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter )
-        heat_source_grid.addWidget(self.danger_label, 1, 2, alignment=Qt.AlignmentFlag.AlignCenter )
+        heat_source_widget = QWidget()
+        heat_source_widget.setProperty("class", "Panel")
+        heat_source_grid = QGridLayout(heat_source_widget)
+        heat_source_grid.setSpacing(0)
+        heat_source_grid.setContentsMargins(0, 0, 0, 0)
+        # 모든 열에 균등한 확장 비율을 할당
+        heat_source_grid.setColumnStretch(0, 1)
+        heat_source_grid.setColumnStretch(1, 1)
+        heat_source_grid.setColumnStretch(2, 1)
 
+
+        self.safety_widget, self.safety_label = self._create_scd_widget("safety", '')
+        self.caution_widget, self.caution_label = self._create_scd_widget("caution", '')
+        self.danger_widget, self.danger_label = self._create_scd_widget("danger", '')
+
+        heat_source_grid.addWidget(self.safety_widget, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+        heat_source_grid.addWidget(self.caution_widget, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+        heat_source_grid.addWidget(self.danger_widget, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter)
+        
         self.humidity_label = QLabel("습도: 55.0%")
         self.humidity_label.setProperty("class", "InfoLabel")
         
         #### ---------------------로그 출력--------------------- ###
         
-        self.log_layout = QGridLayout()
+        self.log_widget = QWidget()
+        self.log_widget.setProperty("class","Panel")
+        self.log_layout = QGridLayout(self.log_widget)
         log_label = QLabel("최신 이상 감지")
         log_clear_button = QPushButton("clear")
 
@@ -420,7 +452,7 @@ class OutputModule(QWidget):
         
         log_clear_button.clicked.connect(self.log_text_panel.clear)
         
-        log_open_button = QPushButton("이상 감지 정보 자세히 보기")
+        log_open_button = QPushButton("자세히 보기")
         log_open_button.clicked.connect(self.open_log_file)
 
         self.log_layout.addWidget(log_label, 0, 0)
@@ -435,7 +467,98 @@ class OutputModule(QWidget):
         ## 설정부 통합 레이아웃
         self.config_layout = QVBoxLayout()
         
+        
+        
+        
+        # -- 온도 표시 위젯 --
+        filter_grid_widget = QWidget()
+        filter_grid_widget.setProperty("class","Panel")
+        fg_layout = QVBoxLayout(filter_grid_widget)
+        
+        
+        display_filter_layout = QHBoxLayout()
+        
+        display_label = QLabel("온도 필터: ")
+        display_degree = QCheckBox("온도 표시", self)
+        display_degree.stateChanged.connect(self.display_degree_control)
+        display_degree.setChecked(True)  # 기본값 설정
+        display_degree_over_avg = QCheckBox("평균이상만", self)
+        display_degree_over_avg.stateChanged.connect(self.display_degree_over_avg_control)
+        display_degree_over_avg.setChecked(False)  # 기본값 설정
+        
+        display_filter_layout.addWidget(display_label)
+        display_filter_layout.addWidget(display_degree)
+        display_filter_layout.addWidget(display_degree_over_avg)
+        
+        # --- 그리드 크기 조절 위젯 ---
+        grid_size_group_box = QWidget()
+        # grid_size_group_box.setObjectName("TopPanel")
+        grid_size_layout = QVBoxLayout(grid_size_group_box)
+        grid_size_up_layout = QHBoxLayout()
+
+        self.grid_label_prefix = QLabel("그리드 해상도:")
+        # self.grid_label_prefix.setProperty("class", "TitleLabel")
+
+        self.grid_size_spinbox = QSpinBox()
+        self.grid_size_spinbox.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8)
+        self.grid_size_spinbox.setSingleStep(self.ORIGINAL_GRID_SIZE)
+        self.grid_size_spinbox.setValue(self.interpolated_grid_size)
+        self.grid_size_spinbox.valueChanged.connect(self._update_grid_size_from_spinbox)
+        self.grid_size_spinbox.setStyleSheet(f"background-color:black")
+        self.grid_size_spinbox.setFont(QFont("Arial", 12))
+
+        self.grid_size_slider = QSlider(Qt.Orientation.Horizontal)
+        self.grid_size_slider.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8)
+        self.grid_size_slider.setSingleStep(self.ORIGINAL_GRID_SIZE)
+        self.grid_size_slider.setValue(self.interpolated_grid_size)
+        self.grid_size_slider.valueChanged.connect(self._update_grid_size_from_slider)
+
+        grid_size_up_layout.addWidget(self.grid_label_prefix)
+        grid_size_up_layout.addStretch(1)
+        grid_size_up_layout.addWidget(self.grid_size_spinbox)
+
+        grid_size_layout.addLayout(grid_size_up_layout)
+        
+        fg_layout.addLayout(display_filter_layout)
+        fg_layout.addWidget(grid_size_group_box)
+        
+                        
+        # --- 히트맵 온도 범위 조절 위젯 ---
+        temp_range_widget = QWidget()
+        temp_range_widget.setProperty("class","Panel")
+        temp_range_layout = QGridLayout(temp_range_widget)
+        
+        temp_range_title = QLabel("히트맵 온도 범위")
+        temp_range_title.setProperty("class", "InfoLabel")
+        
+        self.filter_label = QLabel("필터 온도: N/A")
+        self.filter_label.setProperty("class", "InfoLabel")
+            
+        # 최저 온도 조절 UI
+        min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
+        # 최고 온도 조절 UI
+        max_temp_layout, self.max_temp_spinbox = self._create_temp_control_row("최고", self.max_temp)
+        
+        # 필터링 적용 온도 조절 UI
+        filter_temp_layout, self.filter_temp_spinbox = self._create_temp_control_row("기준", self.filter_temp_add)
+        
+        # Signal 연결 - detector에 파라미터 업데이트 전송
+        self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
+        self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
+        self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
+        
+        temp_range_layout.addWidget(temp_range_title, 0, 0, 1, 1)
+        temp_range_layout.addWidget(self.filter_label, 1, 0, 2, 1)
+        temp_range_layout.addLayout(min_temp_layout, 0, 1)
+        temp_range_layout.addLayout(max_temp_layout, 0, 2)
+        temp_range_layout.addLayout(filter_temp_layout, 1, 2)
+        
+        
         # === 센서 위치 설정 ===
+        posi_weight_widget = QWidget()
+        posi_weight_widget.setProperty("class","Panel")
+        pw_layout = QVBoxLayout(posi_weight_widget)
+        
         position_layout = QHBoxLayout()
         
         # 라디오 버튼 그룹 생성 (상호 배타적 선택 보장)
@@ -459,89 +582,20 @@ class OutputModule(QWidget):
         position_layout.addWidget(self.posi_corner_sensor)
         
         
-        # -- 온도 표시 위젯 --
-        display_filter_layout = QHBoxLayout()
-        
-        display_label = QLabel("온도 필터: ")
-        display_degree = QCheckBox("온도 표시", self)
-        display_degree.stateChanged.connect(self.display_degree_control)
-        display_degree.setChecked(True)  # 기본값 설정
-        display_degree_over_avg = QCheckBox("평균이상만", self)
-        display_degree_over_avg.stateChanged.connect(self.display_degree_over_avg_control)
-        display_degree_over_avg.setChecked(False)  # 기본값 설정
-        
-        display_filter_layout.addWidget(display_label)
-        display_filter_layout.addWidget(display_degree)
-        display_filter_layout.addWidget(display_degree_over_avg)
-        
-        # --- 그리드 크기 조절 위젯 ---
-        grid_size_group_box = QWidget()
-        grid_size_group_box.setObjectName("TopPanel")
-        grid_size_layout = QVBoxLayout(grid_size_group_box)
-        grid_size_up_layout = QHBoxLayout()
-
-        self.grid_label_prefix = QLabel("그리드 해상도:")
-        self.grid_label_prefix.setProperty("class", "TitleLabel")
-
-        self.grid_size_spinbox = QSpinBox()
-        self.grid_size_spinbox.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8)
-        self.grid_size_spinbox.setSingleStep(self.ORIGINAL_GRID_SIZE)
-        self.grid_size_spinbox.setValue(self.interpolated_grid_size)
-        self.grid_size_spinbox.valueChanged.connect(self._update_grid_size_from_spinbox)
-        self.grid_size_spinbox.setStyleSheet(f"background-color:black")
-        self.grid_size_spinbox.setFont(QFont("Arial", 14))
-
-        self.grid_size_slider = QSlider(Qt.Orientation.Horizontal)
-        self.grid_size_slider.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8)
-        self.grid_size_slider.setSingleStep(self.ORIGINAL_GRID_SIZE)
-        self.grid_size_slider.setValue(self.interpolated_grid_size)
-        self.grid_size_slider.valueChanged.connect(self._update_grid_size_from_slider)
-
-        grid_size_up_layout.addWidget(self.grid_label_prefix)
-        grid_size_up_layout.addStretch(1)
-        grid_size_up_layout.addWidget(self.grid_size_spinbox)
-
-        grid_size_layout.addLayout(grid_size_up_layout)
-        
-                        
-        # --- 히트맵 온도 범위 조절 위젯 ---
-        temp_range_layout = QGridLayout()
-        
-        temp_range_title = QLabel("히트맵 온도 범위")
-        temp_range_title.setProperty("class", "TitleLabel")
-        
-        self.filter_label = QLabel("필터 온도: N/A")
-        self.filter_label.setProperty("class", "TitleLabel")
-            
-        # 최저 온도 조절 UI
-        min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
-        # 최고 온도 조절 UI
-        max_temp_layout, self.max_temp_spinbox = self._create_temp_control_row("최고", self.max_temp)
-        
-        # 필터링 적용 온도 조절 UI
-        filter_temp_layout, self.filter_temp_spinbox = self._create_temp_control_row("기준", self.filter_temp_add)
-        
-        # Signal 연결 - detector에 파라미터 업데이트 전송
-        self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
-        self.max_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('max', value))
-        self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
-        
-        temp_range_layout.addWidget(temp_range_title, 0, 0, 1, 1)
-        temp_range_layout.addWidget(self.filter_label, 1, 0, 2, 1)
-        temp_range_layout.addLayout(min_temp_layout, 0, 1)
-        temp_range_layout.addLayout(max_temp_layout, 0, 2)
-        temp_range_layout.addLayout(filter_temp_layout, 1, 2)
-        
         # 가중치 조절 UI 레이아웃 생성
         self.weight_grid_layout = QGridLayout()
         self._create_weight_controls()
 
-        # config layout에 위젯들 추가        
-        self.config_layout.addLayout(position_layout)
-        self.config_layout.addLayout(display_filter_layout)
-        self.config_layout.addWidget(grid_size_group_box)
-        self.config_layout.addLayout(temp_range_layout)
-        self.config_layout.addLayout(self.weight_grid_layout)
+
+        pw_layout.addLayout(position_layout)
+        pw_layout.addLayout(self.weight_grid_layout)
+
+
+        # config layout에 위젯들 추가                
+        self.config_layout.addWidget(filter_grid_widget)
+        self.config_layout.addWidget(temp_range_widget)
+        self.config_layout.addWidget(posi_weight_widget)
+        
         
         
         self.time_label = QLabel("시간: N/A")
@@ -549,14 +603,16 @@ class OutputModule(QWidget):
 
         # left_panel_layout에 위젯들 추가
         
-        left_panel_layout.addLayout(temp_grid_layout)
-        left_panel_layout.addWidget(self.etc_label)
-        left_panel_layout.addLayout(fire_layout)
-        left_panel_layout.addLayout(smoke_layout)
+        left_panel_layout.addWidget(temp_grid_widget)
+        # left_panel_layout.addWidget(self.etc_label)
+        # left_panel_layout.addLayout(fire_layout)
+        # left_panel_layout.addLayout(smoke_layout)
+        
+        left_panel_layout.addWidget(fs_detect_widget)
         
         left_panel_layout.addWidget(self.suspect_fire_label)
-        left_panel_layout.addLayout(heat_source_grid)
-        left_panel_layout.addLayout(self.log_layout)
+        left_panel_layout.addWidget(heat_source_widget)
+        left_panel_layout.addWidget(self.log_widget)
         left_panel_layout.addLayout(self.config_layout)
 
         left_panel_layout.addStretch(1)
@@ -575,6 +631,44 @@ class OutputModule(QWidget):
         main_layout.setColumnStretch(1, 1)
         main_layout.setRowStretch(0, 1)
     
+        
+    def _create_temp_grid(self, label_text, temp_text):
+        temp_widget = QWidget()
+        tempVlayout = QVBoxLayout(temp_widget)
+        label_label = QLabel(label_text)
+        label_label.setProperty('class','TitleLabel')
+        temp_label = QLabel(temp_text)
+        temp_label.setProperty('class','InfoLabel')
+        tempVlayout.addWidget(label_label)      
+        tempVlayout.addWidget(temp_label)
+        
+        temp_widget.setProperty("class", "temp_widget")
+        # temp_widget.setStyleSheet(test1)
+        temp_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        
+        return temp_widget, temp_label
+    
+        
+    def _create_scd_widget(self, label_label, label_text):
+        
+        scd_widget = QWidget()
+        scdVlayout = QVBoxLayout(scd_widget)
+        scd_label = QLabel(label_label)
+        label_text = QLabel(label_text)
+        scdVlayout.addWidget(scd_label)      
+        scdVlayout.addWidget(label_text)
+        
+        scd_label.setProperty("class",'InfoLabel')
+        label_text.setProperty("class",'InfoLabel')
+        scd_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        scd_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        # scd_widget.setProperty("class", "temp_widget")
+        # scd_widget.setStyleSheet(test2)
+        
+        
+        return scd_widget, label_text
+        
     def _create_connection_panel(self):
         """연결 설정 패널 생성"""
         connection_panel = QGroupBox("연결 설정")
@@ -1011,16 +1105,31 @@ class OutputModule(QWidget):
             self.filter_label.setText(f"필터 온도: {filter_temp:.1f}°C")
             
             self.log_text_panel.setText(total_log)
+            self.log_text_panel.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
             # heat source 정보 업데이트
             if heat_source_dict:
                 if heat_source_dict.get('safety', 'N/A') is not None:
-                    safety_text = heat_source_dict.get('safety', 'N/A')
+                    safety_text = len(heat_source_dict.get('safety', 'N/A'))
                 else:
                     safety_text = 'None'
                 
                 self.safety_label.setText(str(safety_text))
-                self.caution_label.setText(str(heat_source_dict.get('caution', 'N/A')))
-                self.danger_label.setText(str(heat_source_dict.get('danger', 'N/A')))
+                self.caution_label.setText(str(len(heat_source_dict.get('caution', 'N/A'))))
+                self.danger_label.setText(str(len(heat_source_dict.get('danger', 'N/A'))))
+                
+                widgets = [self.safety_widget, self.caution_widget, self.danger_widget]
+                keys = ['safety', 'caution', 'danger']
+
+                for widget, key in zip(widgets, keys):
+                    if len(heat_source_dict.get(key, 'N/A')) == 0 :
+                        widget.setObjectName('')
+                        # print(f"{widget}.setObjectName('ID', '')")
+                    else:
+                        widget.setObjectName(key)
+                        
+                        # print(f"{widget}.setObjectName('{key}')")
+                    widget.style().unpolish(widget)
+                    widget.style().polish(widget)         
             
         else:
             self.max_temp_label.setText(f"N/A")
