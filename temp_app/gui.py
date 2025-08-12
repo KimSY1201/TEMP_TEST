@@ -25,10 +25,13 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton, QRadioButton,
                              QSlider, QSpinBox, QDoubleSpinBox, QCheckBox, QButtonGroup,
                              QComboBox, QGroupBox, QFrame, QTextBrowser, QSizePolicy)
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread, QVariantAnimation, QAbstractAnimation
 from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PyQt6.QtCore import QUrl
 import queue
 import time
+
 
 # === 1920x1080 해상도에 맞춰 폰트 크기 상향 조정 ===
 GLOBAL_STYLESHEET = """
@@ -44,8 +47,13 @@ QWidget {
 }
 
 /* 정보 패널(카드) 스타일 */
-#TopPanel, #LeftPanel {
+#TopPanel {
     background-color: #080F25;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+#LeftPanel {
     border-radius: 8px;
     padding: 10px;
 }
@@ -209,12 +217,21 @@ QLabel[styleClass="Indicator"][state="detected"] {
                 
                 
 #safety {
-    border: 3px solid green;
+    border: none;
 }
 #caution {
-    border: 3px solid yellow;
+    border: none;
 }
 #danger {
+    border: none;
+}
+#safety_alert {
+    border: 3px solid green;
+}
+#caution_alert {
+    border: 3px solid yellow;
+}
+#danger_alert {
     border: 3px solid red;
 }
 
@@ -229,6 +246,7 @@ class DataSignal(QObject):
     anomaly_detected_signal = pyqtSignal(int)
     # 포트 변경 시그널 추가
     port_change_signal = pyqtSignal(dict)
+    alarm_signal = pyqtSignal(str)
     
 class DraggableNumberLabel(QLabel):
     """
@@ -305,6 +323,10 @@ class OutputModule(QWidget):
         self.max_width = available_rect.width()
         self.max_height = available_rect.height() - 120
 
+        self.current_file_path = os.path.abspath(__file__)
+        self.current_dir = os.path.dirname(self.current_file_path)
+        
+        
         # 클래스 변수 대신 인스턴스 변수로 관리
         self.original_grid_size = self.ORIGINAL_GRID_SIZE
         self.interpolated_grid_size = self.DEFAULT_INTERPOLATED_GRID_SIZE
@@ -352,6 +374,15 @@ class OutputModule(QWidget):
         self.weight_spinboxes = []
         self.weight_layouts = []
         
+        # 소리재생 플레이어 객체 유무
+        self.player = QMediaPlayer(self)
+        self.audio_output = QAudioOutput(self)
+        self.player.setAudioOutput(self.audio_output)
+        
+        # 시각화 객체 
+        self.animation = QVariantAnimation()
+        
+        
         self.init_ui()
 
     def update_anomaly_count(self, count):
@@ -364,14 +395,14 @@ class OutputModule(QWidget):
         main_layout = QGridLayout(self)
         main_layout.setSpacing(15)
 
-        left_panel = QWidget()
-        left_panel.setObjectName("LeftPanel")
-        left_panel_layout = QVBoxLayout(left_panel)
-        left_panel_layout.setSpacing(5)
+        self.left_panel = QWidget()
+        self.left_panel.setObjectName("LeftPanel")
+        self.left_panel_layout = QVBoxLayout(self.left_panel)
+        self.left_panel_layout.setSpacing(5)
 
         # === 연결 설정 패널 ===
         connection_panel = self._create_connection_panel()
-        left_panel_layout.addWidget(connection_panel)
+        self.left_panel_layout.addWidget(connection_panel)
         
         ## 상단 온도 통합 레이아웃
         temp_grid_widget = QWidget()        
@@ -507,6 +538,12 @@ class OutputModule(QWidget):
         self.grid_size_spinbox.setStyleSheet(f"background-color:black")
         self.grid_size_spinbox.setFont(QFont("Arial", 12))
 
+        self.grid_size_slider = QSlider(Qt.Orientation.Horizontal)
+        self.grid_size_slider.setRange(self.ORIGINAL_GRID_SIZE, self.ORIGINAL_GRID_SIZE * 8)
+        self.grid_size_slider.setSingleStep(self.ORIGINAL_GRID_SIZE)
+        self.grid_size_slider.setValue(self.interpolated_grid_size)
+        self.grid_size_slider.valueChanged.connect(self._update_grid_size_from_slider)
+        
         grid_size_up_layout.addWidget(self.grid_label_prefix)
         grid_size_up_layout.addStretch(1)
         grid_size_up_layout.addWidget(self.grid_size_spinbox)
@@ -596,24 +633,24 @@ class OutputModule(QWidget):
         self.time_label = QLabel("시간: N/A")
         self.time_label.setFont(QFont("Arial", 9))
 
-        # left_panel_layout에 위젯들 추가
+        # self.left_panel_layout에 위젯들 추가
         
-        left_panel_layout.addWidget(temp_grid_widget)
-        # left_panel_layout.addWidget(self.etc_label)
-        # left_panel_layout.addLayout(fire_layout)
-        # left_panel_layout.addLayout(smoke_layout)
+        self.left_panel_layout.addWidget(temp_grid_widget)
+        # self.left_panel_layout.addWidget(self.etc_label)
+        # self.left_panel_layout.addLayout(fire_layout)
+        # self.left_panel_layout.addLayout(smoke_layout)
         
-        left_panel_layout.addWidget(fs_detect_widget)
+        self.left_panel_layout.addWidget(fs_detect_widget)
         
-        left_panel_layout.addWidget(self.suspect_fire_label)
-        left_panel_layout.addWidget(heat_source_widget)
-        left_panel_layout.addWidget(self.log_widget)
-        left_panel_layout.addLayout(self.config_layout)
+        self.left_panel_layout.addWidget(self.suspect_fire_label)
+        self.left_panel_layout.addWidget(heat_source_widget)
+        self.left_panel_layout.addWidget(self.log_widget)
+        self.left_panel_layout.addLayout(self.config_layout)
 
-        left_panel_layout.addStretch(1)
-        left_panel_layout.addWidget(self.time_label)
+        self.left_panel_layout.addStretch(1)
+        self.left_panel_layout.addWidget(self.time_label)
 
-        main_layout.addWidget(left_panel, 0, 0, 2, 1)
+        main_layout.addWidget(self.left_panel, 0, 0, 2, 1)
 
         self.heatmap_layout = QGridLayout()
         self.heatmap_layout.setSpacing(0)
@@ -631,7 +668,7 @@ class OutputModule(QWidget):
         temp_widget = QWidget()
         tempVlayout = QVBoxLayout(temp_widget)
         label_label = QLabel(label_text)
-        label_label.setProperty('class','TitleLabel')
+        label_label.setProperty('class','InfoLabel')
         temp_label = QLabel(temp_text)
         temp_label.setProperty('class','InfoLabel')
         tempVlayout.addWidget(label_label)      
@@ -1120,14 +1157,29 @@ class OutputModule(QWidget):
 
                 for widget, key in zip(widgets, keys):
                     if len(heat_source_dict.get(key, 'N/A')) == 0 :
-                        widget.setObjectName('')
+                        widget.setObjectName(key)
                         # print(f"{widget}.setObjectName('ID', '')")
                     else:
-                        widget.setObjectName(key)
+                        widget.setObjectName(key+'_alert')
                         
                         # print(f"{widget}.setObjectName('{key}')")
-                    widget.style().unpolish(widget)
-                    widget.style().polish(widget)         
+                
+                if len(heat_source_dict.get('danger', 'N/A')):
+                    self.alarm_call('danger')
+                    # self.show_alert_popup(f"{'danger'}가 감지되었습니다!", f"시간: {current_time}\n시스템 로그를 확인하세요.")
+                    self.alert_visual('danger')
+                elif len(heat_source_dict.get('danger', 'N/A')) == 0 and len(heat_source_dict.get('caution', 'N/A')):
+                    self.alarm_call('caution')
+                    self.alert_visual('')
+                else:
+                    self.alert_visual('')
+                    pass
+                           
+                widget.style().unpolish(widget)
+                widget.style().polish(widget)  
+                
+                
+                
             
         else:
             self.max_temp_label.setText(f"N/A")
@@ -1156,7 +1208,7 @@ class OutputModule(QWidget):
 
     def handle_anomaly(self, anomaly_type, current_time):
         QApplication.processEvents()
-        self.show_alert_popup(f"{anomaly_type}가 감지되었습니다!", f"시간: {current_time}\n시스템 로그를 확인하세요.")
+        # self.show_alert_popup(f"{anomaly_type}가 감지되었습니다!", f"시간: {current_time}\n시스템 로그를 확인하세요.")
 
     def update_indicator_status(self, indicator_widget, detected):
         new_state = "detected" if detected else "stable"
@@ -1165,6 +1217,61 @@ class OutputModule(QWidget):
             indicator_widget.style().unpolish(indicator_widget)
             indicator_widget.style().polish(indicator_widget)
 
+    
+    def alert_visual(self, str):
+        if str == 'danger':
+            # 애니메이션이 이미 존재하고 실행 중이면, 아무것도 하지 않고 종료
+            if self.animation and self.animation.state() == QAbstractAnimation.State.Running:
+                return
+            
+            # 애니메이션이 존재하지 않거나 멈춰있으면, 새로운 애니메이션을 시작
+            else:
+                # 기존 애니메이션이 있다면 연결 해제 및 제거
+                if self.animation:
+                    self.animation.valueChanged.disconnect(self.update_background_color)
+                    self.animation = None
+
+                # 새로운 애니메이션 객체 생성
+                self.left_panel.setObjectName("leftPanel_alert")
+                self.animation = QVariantAnimation(self.left_panel)
+                self.animation.setDuration(1000)
+                self.animation.setStartValue(QColor(0, 0, 0, 0)) # 투명
+                self.animation.setEndValue(QColor(255, 0, 0, 255)) # 빨간색
+                
+                # 애니메이션 값이 변할 때마다 호출될 함수 연결
+                self.animation.valueChanged.connect(self.update_background_color)
+                
+                # 무한 반복하도록 설정
+                self.animation.setLoopCount(-1) 
+                
+                self.animation.start()
+                
+        # 'danger'가 아닐 경우, 애니메이션 정지 및 리셋
+        else:
+            self.left_panel.setObjectName("leftPanel")
+            # 먼저 애니메이션 객체가 존재하는지 확인
+            if self.animation:
+                # 애니메이션이 실행 중이면 정지
+                if self.animation.state() != self.animation.State.Stopped:
+                    self.animation.stop()
+
+                # 시그널 연결 해제 및 객체 리셋
+                # disconnect를 호출하기 전에 연결 여부를 확인하는 명시적인 방법은 없으므로,
+                # 애니메이션 객체를 리셋할 때 항상 disconnect를 호출하되,
+                # 이전에 연결이 없었을 가능성을 염두에 두어야 합니다.
+                try:
+                    self.animation.valueChanged.disconnect(self.update_background_color)
+                except TypeError:
+                    pass # 연결되지 않은 경우 무시
+                    
+                self.animation = None
+
+    # QWidget 클래스 내부에 추가할 함수
+    def update_background_color(self, color):
+        color_name = color.name(QColor.NameFormat.HexArgb)
+        style_sheet = f"#leftPanel_alert {{ background-color: {color_name}; }}"
+        self.left_panel.setStyleSheet(style_sheet)
+        
     def update_heatmap(self, processed_values):
         """
         detector에서 처리된 값을 받아서 히트맵 업데이트
@@ -1203,14 +1310,14 @@ class OutputModule(QWidget):
                 cell.setStyleSheet(f"background-color: {color.name()}; color:black; font-weight: bold; font-size: {self.font_size}px; border: none;")
 
     def show_alert_popup(self, title, message):
-        return  # 팝업 비활성화
+        # return  # 팝업 비활성화
         alert = QMessageBox(self)
         alert.setIcon(QMessageBox.Icon.Warning)
         alert.setWindowTitle("! 경고 !")
         alert.setText(title)
         alert.setInformativeText(message)
         alert.setStandardButtons(QMessageBox.StandardButton.Ok)
-        alert.exec()
+        alert.show()
 
     def log_anomaly(self, message):
         pass
@@ -1250,56 +1357,76 @@ class OutputModule(QWidget):
         b = int(max(0, min(255, blue)))
 
         return QColor(r, g, b)
-
-# 실제 센서 데이터를 생성하고 큐에 넣는 역할을 하는 스레드 (테스트용)
-class DataGeneratorThread(QThread):
-    def __init__(self, data_queue, data_signal_obj):
-        super().__init__()
-        self.data_queue = data_queue
-        self.signal = data_signal_obj
-        self.running = True
-        self.time_counter = 0
-
-    def run(self):
-        while self.running:
-            self.time_counter += 1
-            # 8x8 원본 데이터 생성 (평균 25도, 가끔 35도 이상 값 발생)
-            base_temps = np.random.normal(25.0, 2.0, OutputModule.ORIGINAL_GRID_SIZE**2)
-            if random.random() < 0.2:  # 20% 확률로 이상 고온 발생
-                anomaly_index = random.randint(0, 63)
-                base_temps[anomaly_index] = random.uniform(35.0, 45.0)
-
-            data_package = {
-                'time': datetime.now().strftime("%H:%M:%S"),
-                'values': base_temps.tolist(),
-                'sensor_degree': np.mean(base_temps) + random.uniform(-0.5, 0.5),
-                'etc': [round(random.uniform(20,80),1), round(random.uniform(20,80),1)],
-            }
-            # DetectionModule로 데이터 전송 (처리를 위해)
-            self.data_queue.put(data_package)
+    
+    
+    def alarm_call(self, str):
+        print('get', str)
+        # 1. QMediaPlayer 및 QAudioOutput 객체 생성
+        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+            return
+        else:
+            self.player = QMediaPlayer()
+            self.audio_output = QAudioOutput()
+            self.player.setAudioOutput(self.audio_output)
             
-            time.sleep(1)  # 1초 대기
+            # 2. 재생할 파일 설정 (파일 경로는 실제 파일로 변경해야 합니다)
+            file_path = f"{self.current_dir}/_asset/sound/{str}.mp3"  
+            print(file_path)
+            self.player.setSource(QUrl.fromLocalFile(file_path))
 
-    def stop(self):
-        self.running = False
-        self.wait()
+            # 3. 재생
+            self.audio_output.setVolume(30)  # 볼륨 설정 (0~100)
+            self.player.play()
 
-# GUI 큐에서 데이터를 받아서 GUI에 전달하는 스레드
-class GUIUpdateThread(QThread):
-    def __init__(self, gui_queue, data_signal):
-        super().__init__()
-        self.gui_queue = gui_queue
-        self.data_signal = data_signal
-        self.running = True
+# # 실제 센서 데이터를 생성하고 큐에 넣는 역할을 하는 스레드 (테스트용)
+# class DataGeneratorThread(QThread):
+#     def __init__(self, data_queue, data_signal_obj):
+#         super().__init__()
+#         self.data_queue = data_queue
+#         self.signal = data_signal_obj
+#         self.running = True
+#         self.time_counter = 0
+
+#     def run(self):
+#         while self.running:
+#             self.time_counter += 1
+#             # 8x8 원본 데이터 생성 (평균 25도, 가끔 35도 이상 값 발생)
+#             base_temps = np.random.normal(25.0, 2.0, OutputModule.ORIGINAL_GRID_SIZE**2)
+#             if random.random() < 0.2:  # 20% 확률로 이상 고온 발생
+#                 anomaly_index = random.randint(0, 63)
+#                 base_temps[anomaly_index] = random.uniform(35.0, 45.0)
+
+#             data_package = {
+#                 'time': datetime.now().strftime("%H:%M:%S"),
+#                 'values': base_temps.tolist(),
+#                 'sensor_degree': np.mean(base_temps) + random.uniform(-0.5, 0.5),
+#                 'etc': [round(random.uniform(20,80),1), round(random.uniform(20,80),1)],
+#             }
+#             # DetectionModule로 데이터 전송 (처리를 위해)
+#             self.data_queue.put(data_package)
+            
+#             time.sleep(1)  # 1초 대기
+
+#     def stop(self):
+#         self.running = False
+#         self.wait()
+
+# # GUI 큐에서 데이터를 받아서 GUI에 전달하는 스레드
+# class GUIUpdateThread(QThread):
+#     def __init__(self, gui_queue, data_signal):
+#         super().__init__()
+#         self.gui_queue = gui_queue
+#         self.data_signal = data_signal
+#         self.running = True
         
-    def run(self):
-        while self.running:
-            if not self.gui_queue.empty():
-                data_package = self.gui_queue.get()
-                self.data_signal.update_data_signal.emit(data_package)
-            else:
-                time.sleep(0.1)
+#     def run(self):
+#         while self.running:
+#             if not self.gui_queue.empty():
+#                 data_package = self.gui_queue.get()
+#                 self.data_signal.update_data_signal.emit(data_package)
+#             else:
+#                 time.sleep(0.1)
                 
-    def stop(self):
-        self.running = False
-        self.wait()
+#     def stop(self):
+#         self.running = False
+#         self.wait()

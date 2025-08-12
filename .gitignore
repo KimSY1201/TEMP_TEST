@@ -1,0 +1,14 @@
+build/
+dist/
+
+#실험용
+# temp_app_test/
+# temp_app_test2/degree_test.csv
+_old/
+# _data/
+# 보존용
+_temp_app_0731/
+temp_app2/
+
+*/_data
+*/_model
