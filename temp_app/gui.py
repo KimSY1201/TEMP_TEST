@@ -25,8 +25,9 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QGridLayout, QMessageBox, QPushButton, QRadioButton,
                              QSlider, QSpinBox, QDoubleSpinBox, QCheckBox, QButtonGroup,
                              QComboBox, QGroupBox, QFrame, QTextBrowser, QSizePolicy)
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QPoint, QThread, QVariantAnimation, QAbstractAnimation
-from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent
+from PyQt6.QtCore import (Qt, QTimer, pyqtSignal, QObject, QPoint, QThread, QVariantAnimation, 
+                          QAbstractAnimation, QEvent)
+from PyQt6.QtGui import QColor, QFont, QScreen, QMouseEvent, QResizeEvent
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtCore import QUrl
 import queue
@@ -54,6 +55,8 @@ QWidget {
 }
 
 #LeftPanel {
+    background-color: #080F25;
+    
     border-radius: 8px;
     padding: 10px;
 }
@@ -320,9 +323,16 @@ class OutputModule(QWidget):
 
     def __init__(self, data_signal_obj, available_rect):
         super().__init__()
+        
+        
+        
         self.max_width = available_rect.width()
         self.max_height = available_rect.height() - 120
-
+        print(self.max_height)
+        self.current_size = self.size()
+        # self.setMaximumSize(available_rect.width(), available_rect.height())
+        
+        
         self.current_file_path = os.path.abspath(__file__)
         self.current_dir = os.path.dirname(self.current_file_path)
         
@@ -356,6 +366,18 @@ class OutputModule(QWidget):
         self.data_signal.update_data_signal.connect(self.update_display)
         self.data_signal.anomaly_detected_signal.connect(self.update_anomaly_count)
 
+        
+        # == 온도 출력 on off == 
+        self.display_heatmap = False
+        
+
+        if not self.display_heatmap:
+            self.setMinimumSize(480, 640)
+        else:
+            self.setMinimumSize(1120, 840)
+        
+        
+        
         # === 히트맵 온도 범위 인스턴스 변수 (detector와 동기화) ===
         self.min_temp = 19.0
         self.max_temp = 32.0
@@ -391,31 +413,52 @@ class OutputModule(QWidget):
     def init_ui(self):
         self.setObjectName("MainWindow")
         self.setWindowTitle('temp_app_test 통합 관제 시스템')
-
-        main_layout = QGridLayout(self)
-        main_layout.setSpacing(15)
+        self.setContentsMargins(0,0,0,0)
+        
+        self.main_layout = QGridLayout(self)
+        self.main_layout.setSpacing(10)
+        self.main_layout.setContentsMargins(0,0,0,0)
 
         self.left_panel = QWidget()
+        self.left_panel.setMinimumSize(480, 640)
+        
         self.left_panel.setObjectName("LeftPanel")
         self.left_panel_layout = QVBoxLayout(self.left_panel)
         self.left_panel_layout.setSpacing(5)
-
         # === 연결 설정 패널 ===
         connection_panel = self._create_connection_panel()
-        self.left_panel_layout.addWidget(connection_panel)
+        
         
         ## 상단 온도 통합 레이아웃
         temp_grid_widget = QWidget()        
         temp_grid_widget.setProperty('class','Panel')
         temp_grid_layout = QGridLayout(temp_grid_widget)
         
+        # 필터링 적용 온도 조절 UI
         self.sensor_temp_widget, self.sensor_temp_label = self._create_temp_grid("센서", "")
         self.max_temp_widget, self.max_temp_label = self._create_temp_grid("최고", "")
         self.avg_temp_widget, self.avg_temp_label = self._create_temp_grid("평균", "")
         
+        self.filter_temp_widget = QWidget()
+        self.filter_temp_layout = QVBoxLayout(self.filter_temp_widget)
+        self.filter_label = QLabel("필터 온도: N/A")
+        self.filter_label.setProperty("class", "InfoLabel")
+        self.filter_temp_spinbox = QDoubleSpinBox()
+        self.filter_temp_spinbox.setRange(-50.0, 100.0)
+        self.filter_temp_spinbox.setSingleStep(0.1)
+        self.filter_temp_spinbox.setDecimals(1)
+        self.filter_temp_spinbox.setValue(self.filter_temp_add)
+        self.filter_temp_widget.setProperty("class", "temp_widget")
+        self.filter_temp_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        
+        self.filter_temp_layout.addWidget(self.filter_label)
+        self.filter_temp_layout.addWidget(self.filter_temp_spinbox)
+                
         temp_grid_layout.addWidget(self.sensor_temp_widget, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter )
         temp_grid_layout.addWidget(self.max_temp_widget, 0, 1, alignment=Qt.AlignmentFlag.AlignCenter )
         temp_grid_layout.addWidget(self.avg_temp_widget, 0, 2, alignment=Qt.AlignmentFlag.AlignCenter )
+        temp_grid_layout.addWidget(self.filter_temp_widget, 0, 3, alignment=Qt.AlignmentFlag.AlignCenter )
+               
         
         self.etc_label = QLabel("기타: N/A")
         self.etc_label.setProperty("class", "TitleLabel")
@@ -440,6 +483,7 @@ class OutputModule(QWidget):
         #--------------------------------------------------
         
         self.suspect_fire_label = QLabel("의심 열원: N/A")
+        self.suspect_fire_label.setProperty('class','InfoLabel')
         self.suspect_fire_label.setProperty("class", "Panel")
         
         
@@ -489,20 +533,63 @@ class OutputModule(QWidget):
         self.log_layout.addWidget(log_open_button, 0, 2)
         self.log_layout.addWidget(self.log_text_panel, 1, 0, 1, 3)
         
-                
+
+        ## 설정부 통합 레이아웃
+        self.grid_visiblity_cbox = QCheckBox("히트맵 보기", self)
+        self.grid_visiblity_cbox.stateChanged.connect(self.grid_visiblity_control)
+        
+            
+        
+        self.time_label = QLabel("시간: N/A")
+        self.time_label.setFont(QFont("Arial", 9))
+
+        # self.left_panel_layout에 위젯들 추가
+
+
+        
+        connection_panel.setMinimumHeight(120)
+        temp_grid_widget.setMinimumHeight(120)
+        fs_detect_widget.setMinimumHeight(50)
+        self.suspect_fire_label.setMinimumHeight(50)
+        self.log_widget.setMinimumHeight(120)
+
+        self.left_panel_layout.addWidget(connection_panel)
+        self.left_panel_layout.addWidget(temp_grid_widget)  
+        self.left_panel_layout.addWidget(fs_detect_widget)
+        self.left_panel_layout.addWidget(self.suspect_fire_label)
+        self.left_panel_layout.addWidget(heat_source_widget)
+        self.left_panel_layout.addWidget(self.log_widget)
+        self.left_panel_layout.addWidget(self.grid_visiblity_cbox)
+
+        # self.left_panel_layout.addStretch(1)
+        self.left_panel_layout.addWidget(self.time_label)
+
+        self.main_layout.addWidget(self.left_panel, 0, 0, 2, 1)
+        
+        self.heatmap_widget = QWidget()
+        # self.heatmap_widget.setStyleSheet(""" border: 5px solid green; """)
+        
+        self.heatmap_layout = QGridLayout(self.heatmap_widget)
+        self.heatmap_layout.setSpacing(0)
+        self.heatmap_layout.setContentsMargins(0,0,0,0)
+        # self.main_layout.addLayout(self.heatmap_layout, 0, 1, 2, 2)
+
+        self.bottom_panel = QWidget()
+        self.bottom_panel.setFixedHeight(200)
+        self.bottom_panel_layout = QHBoxLayout(self.bottom_panel)
+        
         ##### -------------------- 조작부 ---------------------- ###
         
+        self.config_widget = QWidget()
+        self.config_layout = QGridLayout(self.config_widget)
         
-        ## 설정부 통합 레이아웃
-        self.config_layout = QVBoxLayout()
-        
-        
+        # self.grid_visiblity_cbox.toggle()
         
         
         # -- 온도 표시 위젯 --
-        filter_grid_widget = QWidget()
-        filter_grid_widget.setProperty("class","Panel")
-        fg_layout = QVBoxLayout(filter_grid_widget)
+        self.filter_grid_widget = QWidget()
+        self.filter_grid_widget.setProperty("class","Panel")
+        fg_layout = QHBoxLayout(self.filter_grid_widget)
         
         
         display_filter_layout = QHBoxLayout()
@@ -555,23 +642,19 @@ class OutputModule(QWidget):
         
                         
         # --- 히트맵 온도 범위 조절 위젯 ---
-        temp_range_widget = QWidget()
-        temp_range_widget.setProperty("class","Panel")
-        temp_range_layout = QGridLayout(temp_range_widget)
+        self.temp_range_widget = QWidget()
+        self.temp_range_widget.setProperty("class","Panel")
+        temp_range_layout = QGridLayout(self.temp_range_widget)
         
         temp_range_title = QLabel("히트맵 온도 범위")
         temp_range_title.setProperty("class", "InfoLabel")
         
-        self.filter_label = QLabel("필터 온도: N/A")
-        self.filter_label.setProperty("class", "InfoLabel")
             
         # 최저 온도 조절 UI
         min_temp_layout, self.min_temp_spinbox = self._create_temp_control_row("최저", self.min_temp)
         # 최고 온도 조절 UI
         max_temp_layout, self.max_temp_spinbox = self._create_temp_control_row("최고", self.max_temp)
         
-        # 필터링 적용 온도 조절 UI
-        filter_temp_layout, self.filter_temp_spinbox = self._create_temp_control_row("기준", self.filter_temp_add)
         
         # Signal 연결 - detector에 파라미터 업데이트 전송
         self.min_temp_spinbox.valueChanged.connect(lambda value: self._update_temp_range('min', value))
@@ -579,16 +662,14 @@ class OutputModule(QWidget):
         self.filter_temp_spinbox.valueChanged.connect(lambda value: self._update_filter_weight('filter_add', value))
         
         temp_range_layout.addWidget(temp_range_title, 0, 0, 1, 1)
-        temp_range_layout.addWidget(self.filter_label, 1, 0, 2, 1)
         temp_range_layout.addLayout(min_temp_layout, 0, 1)
         temp_range_layout.addLayout(max_temp_layout, 0, 2)
-        temp_range_layout.addLayout(filter_temp_layout, 1, 2)
         
         
         # === 센서 위치 설정 ===
-        posi_weight_widget = QWidget()
-        posi_weight_widget.setProperty("class","Panel")
-        pw_layout = QVBoxLayout(posi_weight_widget)
+        self.posi_weight_widget = QWidget()
+        self.posi_weight_widget.setProperty("class","Panel")
+        pw_layout = QVBoxLayout(self.posi_weight_widget)
         
         position_layout = QHBoxLayout()
         
@@ -624,46 +705,119 @@ class OutputModule(QWidget):
 
 
         # config layout에 위젯들 추가                
-        self.config_layout.addWidget(filter_grid_widget)
-        self.config_layout.addWidget(temp_range_widget)
-        self.config_layout.addWidget(posi_weight_widget)
+        self.filter_grid_widget.setMinimumHeight(50)
+        self.temp_range_widget.setMinimumHeight(50)
+        self.posi_weight_widget.setMinimumHeight(200)
+        self.config_layout.addWidget(self.filter_grid_widget,0,0)
+        self.config_layout.addWidget(self.temp_range_widget,1,0)
+        self.config_layout.addWidget(self.posi_weight_widget,0,1,2,1)
         
         
+        self.main_layout.addWidget(self.bottom_panel,2,0,1,3)
+        self.left_panel.raise_()
         
-        self.time_label = QLabel("시간: N/A")
-        self.time_label.setFont(QFont("Arial", 9))
-
-        # self.left_panel_layout에 위젯들 추가
-        
-        self.left_panel_layout.addWidget(temp_grid_widget)
-        # self.left_panel_layout.addWidget(self.etc_label)
-        # self.left_panel_layout.addLayout(fire_layout)
-        # self.left_panel_layout.addLayout(smoke_layout)
-        
-        self.left_panel_layout.addWidget(fs_detect_widget)
-        
-        self.left_panel_layout.addWidget(self.suspect_fire_label)
-        self.left_panel_layout.addWidget(heat_source_widget)
-        self.left_panel_layout.addWidget(self.log_widget)
-        self.left_panel_layout.addLayout(self.config_layout)
-
-        self.left_panel_layout.addStretch(1)
-        self.left_panel_layout.addWidget(self.time_label)
-
-        main_layout.addWidget(self.left_panel, 0, 0, 2, 1)
-
-        self.heatmap_layout = QGridLayout()
-        self.heatmap_layout.setSpacing(0)
-        self.heatmap_layout.setContentsMargins(0,0,0,0)
-        main_layout.addLayout(self.heatmap_layout, 0, 1, 2, 1)
-
-        # 초기 히트맵 생성
-        self._create_heatmap_cells()
-
-        main_layout.setColumnStretch(1, 1)
-        main_layout.setRowStretch(0, 1)
+        # self.main_layout.setColumnStretch(1, 1)
+        # self.main_layout.setRowStretch(0, 1)
     
+    def changeEvent(self, event):
+        if event.type() == QEvent.Type.WindowStateChange:
+            # 창의 새로운 상태를 확인
+            if self.windowState() == Qt.WindowState.WindowMaximized:
+                self.heatmap_widget.setFixedSize(self.max_height, self.max_height)
+                if self.grid_visiblity_cbox.isChecked():
+                    self.grid_visiblity_cbox.toggle()
+                
+                self.grid_visiblity_cbox.setChecked(True)
+                self.grid_visiblity_cbox.setDisabled(True)
+                
+                print(self.heatmap_widget.width(), self.heatmap_widget.height())
+                # self.config_layout = QGridLayout()
+                # config layout에 위젯들 추가                
+                self.config_layout.removeWidget(self.filter_grid_widget)
+                self.config_layout.removeWidget(self.temp_range_widget)
+                self.config_layout.removeWidget(self.posi_weight_widget)
+                self.config_layout.addWidget(self.filter_grid_widget,0,0)
+                self.config_layout.addWidget(self.temp_range_widget,1,0)
+                self.config_layout.addWidget(self.posi_weight_widget,2,0)
+                
+                self.config_widget.setParent(None)
+                self.left_panel_layout.addWidget(self.config_widget)
+                self.left_panel.setMinimumHeight(self.max_height)
+                # self.left_panel.setFixedSize()
+                
+            # elif self.windowState() == Qt.WindowState.WindowMinimized:
+            #     print("창이 최소화되었습니다.")
+            #     self.status_label.setText("창이 최소화되었습니다.")
+            else:
+                self.heatmap_widget.setFixedSize(640, 640)
+                if self.grid_visiblity_cbox.isChecked():
+                    self.grid_visiblity_cbox.toggle()
+                    self.grid_visiblity_cbox.toggle()
+                self.grid_visiblity_cbox.setEnabled(True)
+                
+                
+                print(self.heatmap_widget.width(), self.heatmap_widget.height())
+                
         
+        super().changeEvent(event)
+        
+    
+    def grid_visiblity_control(self, state):
+        """온도 표시 체크박스 제어"""
+        # self.grid_visiblity_control = bool(state)
+        self.display_heatmap = state
+        
+        if not self.display_heatmap:
+            self.setMinimumSize(480, 640)
+        else:
+            self.setMinimumSize(1120, 840)
+        # print(state)
+        if state == False:
+            while self.heatmap_layout.count():
+                item = self.heatmap_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
+            self.heatmap_widget = QWidget()
+            self.heatmap_layout = QGridLayout(self.heatmap_widget)
+            
+            self.heatmap_layout.setSpacing(0)
+            self.heatmap_layout.setContentsMargins(0,0,0,0)
+            self.grid_cells = []
+            
+            self.left_panel.raise_()
+            self.config_widget.setParent(None)
+            # self.config_widget.setEnabled(False)
+            if not self.isMaximized():
+                self.resize(480,640)
+                self.left_panel.setMinimumHeight(640)
+            # self.adjustSize()
+        else:
+            self.main_layout.addWidget(self.heatmap_widget, 0, 1, 2, 2, Qt.AlignmentFlag.AlignRight)
+            # if not self.isMaximized():
+            #     self.bottom_panel_layout.insertWidget(0, self.config_widget)
+            # else:
+                # config layout에 위젯들 추가
+            self.config_layout.removeWidget(self.filter_grid_widget)
+            self.config_layout.removeWidget(self.temp_range_widget)
+            self.config_layout.removeWidget(self.posi_weight_widget)                
+            self.config_layout.addWidget(self.filter_grid_widget,0,0)
+            self.config_layout.addWidget(self.temp_range_widget,1,0)
+            self.config_layout.addWidget(self.posi_weight_widget,0,1,2,1)
+            
+            self.config_widget.setParent(None)
+            self.bottom_panel_layout.addWidget(self.config_widget)
+            # self.heatmap_widget.setFixedSize(640, 640)
+            # 초기 히트맵 생성
+            self._create_heatmap_cells()    
+            
+            
+            if not self.isMaximized():
+                self.resize(1120, 840)
+                self.left_panel.setMinimumHeight(640)
+                
+            # self.adjustSize()
+    
     def _create_temp_grid(self, label_text, temp_text):
         temp_widget = QWidget()
         tempVlayout = QVBoxLayout(temp_widget)
@@ -676,7 +830,7 @@ class OutputModule(QWidget):
         
         temp_widget.setProperty("class", "temp_widget")
         # temp_widget.setStyleSheet(test1)
-        temp_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        temp_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         
         return temp_widget, temp_label
     
@@ -694,7 +848,7 @@ class OutputModule(QWidget):
         label_text.setProperty("class",'InfoLabel')
         scd_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        scd_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        scd_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         # scd_widget.setProperty("class", "temp_widget")
         # scd_widget.setStyleSheet(test2)
         
@@ -856,8 +1010,8 @@ class OutputModule(QWidget):
             self.weight_spinboxes.append(spinbox)
             
             # 그리드 레이아웃에 추가
-            row = i // 2
-            col = i % 2
+            row = i % 2
+            col = i // 2
             self.weight_grid_layout.addLayout(layout, row, col+1)
     
     def _clear_weight_controls(self):
@@ -1019,6 +1173,8 @@ class OutputModule(QWidget):
         self.data_signal.parameter_update_signal.emit(params)
             
     def _create_heatmap_cells(self):
+        if not self.display_heatmap:
+            return
         # 기존 셀들을 모두 제거
         if self.grid_cells:
             for row in self.grid_cells:
@@ -1030,7 +1186,11 @@ class OutputModule(QWidget):
         self.grid_cells = []
         
         # 현재 화면 높이에 맞춰 셀 크기 재계산
-        self.cell_size = self.max_height // self.interpolated_grid_size
+        if self.isMaximized():
+            self.cell_size = self.max_height // self.interpolated_grid_size
+        else:
+            self.cell_size = 640 // self.interpolated_grid_size    
+        # print(self.cell_size)
         self.font_size = self.cell_size // 3 
         
         for i in range(self.interpolated_grid_size):
@@ -1038,6 +1198,7 @@ class OutputModule(QWidget):
             for j in range(self.interpolated_grid_size):
                 cell = QLabel()
                 cell.setFixedSize(self.cell_size, self.cell_size)
+                # cell.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
                 cell.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 cell.setProperty("class", "HeatmapCell")
                 
@@ -1137,6 +1298,7 @@ class OutputModule(QWidget):
             self.etc_label.setText(f"기타: {etc}")
             self.object_detection_label.setText(f"객체: {object_detection}")
             self.suspect_fire_label.setText(f"의심 열원: {suspect_fire}")
+            
             self.filter_label.setText(f"필터 온도: {filter_temp:.1f}°C")
             
             self.log_text_panel.setText(total_log)
@@ -1159,6 +1321,8 @@ class OutputModule(QWidget):
                     if len(heat_source_dict.get(key, 'N/A')) == 0 :
                         widget.setObjectName(key)
                         # print(f"{widget}.setObjectName('ID', '')")
+                        # if key == 'caution':
+                        #     print('key is', key)
                     else:
                         widget.setObjectName(key+'_alert')
                         
@@ -1174,10 +1338,12 @@ class OutputModule(QWidget):
                 else:
                     self.alert_visual('')
                     pass
-                           
-                widget.style().unpolish(widget)
-                widget.style().polish(widget)  
                 
+                for widget in widgets:
+                    widget.style().unpolish(widget)
+                    widget.style().polish(widget)  
+                self.left_panel.style().unpolish(self.left_panel)
+                self.left_panel.style().polish(self.left_panel)  
                 
                 
             
@@ -1278,6 +1444,10 @@ class OutputModule(QWidget):
         더 이상 GUI에서 보간이나 필터링을 하지 않음
         """
         if not processed_values:
+            return
+        
+        if not self.display_heatmap:
+            # print(self.display_heatmap)
             return
             
         # processed_values는 이미 적절한 크기로 처리됨
