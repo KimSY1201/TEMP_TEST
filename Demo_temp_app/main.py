@@ -14,7 +14,7 @@ from signals import DataSignal
 # 자동 연결 설정 (TCP 전용)
 # ==========================
 AUTO_CONNECT = True
-DEFAULT_PORT = 8081  # TCP 통신을 위한 기본 포트 번호
+DEFAULT_PORT = 8080  # TCP 통신을 위한 기본 포트 번호
 DEFAULT_BAUDRATE = 57600 # TCP에서는 사용되지 않음
 
 # ==========================
@@ -107,7 +107,6 @@ class ApplicationManager:
 
     def on_port_changed(self, port_info):
         """GUI로부터 포트 변경 신호를 받았을 때 호출되는 콜백 함수"""
-        # 기본 포트를 'COM3'가 아닌 TCP 기본 포트로 변경
         port = port_info.get('port', DEFAULT_PORT)
         baudrate = port_info.get('baudrate', DEFAULT_BAUDRATE)
 

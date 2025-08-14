@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 
 from signals import DataSignal
 
-# (스타일시트 코드는 생략하지 않음)
+# (스타일시트 코드는 변경 없음)
 GLOBAL_STYLESHEET = """
 /* 전체 위젯 기본 스타일 */
 QWidget { color: #E0E0E0; font-family: 'Malgun Gothic', 'Segoe UI', 'Arial'; }
@@ -71,61 +71,40 @@ class SensorCard(QFrame):
         super().__init__()
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setAutoFillBackground(True)
-        self.t = QLabel(name)
-        self.t.setStyleSheet("font-weight:800;")
-        self.s = QLabel("대기 중")
-        self.w = QLabel("-")
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(14,10,14,10)
-        lay.setSpacing(4)
-        lay.addWidget(self.t)
-        lay.addWidget(self.s)
-        lay.addWidget(self.w)
+        self.t = QLabel(name); self.t.setStyleSheet("font-weight:800;")
+        self.s = QLabel("대기 중"); self.w = QLabel("-")
+        lay = QVBoxLayout(self); lay.setContentsMargins(14,10,14,10); lay.setSpacing(4)
+        lay.addWidget(self.t); lay.addWidget(self.s); lay.addWidget(self.w)
         self.apply("정상")
     def apply(self, status, ts=None):
         self.s.setText("화재 발생" if status in ("화재","fire") else ("주의" if status in ("주의","warn","warning") else "정상"))
         self.w.setText(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(ts or time.time())))
         bg, fg = status_colors(status)
-        pal = self.palette()
-        pal.setColor(QPalette.ColorRole.Window, bg)
-        pal.setColor(QPalette.ColorRole.WindowText, fg)
+        pal = self.palette(); pal.setColor(QPalette.ColorRole.Window, bg); pal.setColor(QPalette.ColorRole.WindowText, fg)
         self.setPalette(pal)
-        for w in (self.t, self.s, self.w):
-            w.setStyleSheet(f"color:{fg.name()};")
+        for w in (self.t, self.s, self.w): w.setStyleSheet(f"color:{fg.name()};")
 
 class MapView(QWidget):
     def __init__(self, img_path, positions):
         super().__init__()
-        self.positions = positions
-        self.base = QLabel()
-        self.base.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.positions = positions; self.base = QLabel(); self.base.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pm = QPixmap(img_path)
-        if pm.isNull():
-            self.base.setText("floorplan.png 를 찾지 못했습니다.")
-            self.base.setStyleSheet("border:1px dashed #999;")
-        else:
-            self.base.setPixmap(pm)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(0,0,0,0)
-        lay.addWidget(self.base)
+        if pm.isNull(): self.base.setText("floorplan.png 를 찾지 못했습니다."); self.base.setStyleSheet("border:1px dashed #999;")
+        else: self.base.setPixmap(pm)
+        lay = QVBoxLayout(self); lay.setContentsMargins(0,0,0,0); lay.addWidget(self.base)
         self.btns = {}
         for sid in self.positions:
-            b = QPushButton(f"sensor {sid}", self)
-            b.setStyleSheet("QPushButton{border:0; font-weight:700; padding:6px 8px; border-radius:14px;}")
-            self.btns[sid] = b
+            b = QPushButton(f"sensor {sid}", self); b.setStyleSheet("QPushButton{border:0; font-weight:700; padding:6px 8px; border-radius:14px;}"); self.btns[sid] = b
     def resizeEvent(self, e):
-        super().resizeEvent(e)
-        pm = self.base.pixmap()
+        super().resizeEvent(e); pm = self.base.pixmap()
         if not pm or pm.isNull(): return
-        iw, ih = pm.width(), pm.height()
-        lw, lh = self.base.width(), self.base.height()
+        iw, ih = pm.width(), pm.height(); lw, lh = self.base.width(), self.base.height()
         if iw == 0 or ih == 0: return
         scale = min(lw/iw, lh/ih)
         offx, offy = (lw - iw*scale)/2, (lh - ih*scale)/2
-        for sid,(x,y) in self.positions.items():
-            self.btns[sid].move(int(offx + x*scale)-28, int(offy + y*scale)-12)
+        for sid,(x,y) in self.positions.items(): self.btns[sid].move(int(offx + x*scale)-28, int(offy + y*scale)-12)
     def set_status(self, sid, status, room=""):
-        b = self.btns.get(sid)
+        b = self.btns.get(sid);
         if not b: return
         bg, fg = status_colors(status)
         b.setText(f"sensor {sid}\n{room}" if room else f"sensor {sid}")
@@ -133,34 +112,20 @@ class MapView(QWidget):
 
 class Heatmap(QWidget):
     def __init__(self, n=8):
-        super().__init__()
-        self.n = n
-        self.min_t, self.max_t = 20.0, 40.0
-        self.show_numbers = True
-        self.grid = QGridLayout(self)
-        self.grid.setSpacing(1)
-        self.grid.setContentsMargins(0,0,0,0)
-        self.cells = []
-        self._build(n)
+        super().__init__(); self.n = n; self.min_t, self.max_t = 20.0, 40.0; self.show_numbers = True
+        self.grid = QGridLayout(self); self.grid.setSpacing(1); self.grid.setContentsMargins(0,0,0,0); self.cells = []; self._build(n)
     def _build(self, n):
         for row in self.cells:
             for cell in row: cell.deleteLater()
         self.cells=[]
         for i in range(n):
-            row = []
+            row = [];
             for j in range(n):
-                lb = QLabel("--")
-                lb.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                lb.setMinimumSize(28,20)
-                lb.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-                lb.setStyleSheet("border:0; font-weight:700;")
-                self.grid.addWidget(lb,i,j)
-                row.append(lb)
+                lb = QLabel("--"); lb.setAlignment(Qt.AlignmentFlag.AlignCenter); lb.setMinimumSize(28,20); lb.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+                lb.setStyleSheet("border:0; font-weight:700;"); self.grid.addWidget(lb,i,j); row.append(lb)
             self.cells.append(row)
     def set_grid(self, n):
-        if n != self.n:
-            self.n = n
-            self._build(n)
+        if n != self.n: self.n = n; self._build(n)
     def _color(self, v):
         t = clamp((v-self.min_t)/(self.max_t-self.min_t), 0.0, 1.0) if self.max_t != self.min_t else 0
         if t<=0.25: r,g,b = 0, int(4*t*255), 255
@@ -173,9 +138,7 @@ class Heatmap(QWidget):
         if not n or len(mat[0])!=n: return
         self.set_grid(n)
         vals = [v for row in mat for v in row]
-        if vals:
-            self.min_t = min(self.min_t, min(vals))
-            self.max_t = max(self.max_t, max(vals))
+        if vals: self.min_t = min(self.min_t, min(vals)); self.max_t = max(self.max_t, max(vals))
         for i in range(n):
             for j in range(n):
                 self.cells[i][j].setStyleSheet(f"background:{self._color(mat[i][j]).name()}; color:#000; font-weight:700;")
@@ -197,20 +160,46 @@ class Dashboard(QMainWindow):
         all_positions = {1:(140,400), 2:(110,190), 3:(250,190), 4:(360,190), 5:(320,410)}
         positions = {i: all_positions[i] for i in range(1, self.NUM_SENSORS + 1) if i in all_positions}
         self.map = MapView(floorplan, positions)
-        lwrap = QWidget(); ll = QVBoxLayout(lwrap); title = QLabel("현장 MAP"); title.setStyleSheet("font-weight:800;"); ll.addWidget(title); ll.addWidget(self.map,1); splitter.addWidget(lwrap)
+        lwrap = QWidget(); ll = QVBoxLayout(lwrap)
+        title = QLabel("현장 MAP"); title.setStyleSheet("font-weight:800;") 
+        ll.addWidget(title); ll.addWidget(self.map,1); splitter.addWidget(lwrap)
         right = QWidget(); rlay = QVBoxLayout(right); rlay.setSpacing(10)
-        fire_bg, fire_fg = status_colors("화재"); warn_bg, warn_fg = status_colors("주의"); normal_bg, nor_fg = status_colors("정상")
-        self.pill_fire, self.pill_warn, self.pill_normal = CountPill("화재", fire_bg, fire_fg), CountPill("주의", warn_bg, warn_fg), CountPill("정상", normal_bg, nor_fg)
-        counts_bar = QHBoxLayout(); counts_bar.setSpacing(8); [counts_bar.addWidget(p) for p in (self.pill_fire, self.pill_warn, self.pill_normal)]; counts_bar.addStretch(1); rlay.addLayout(counts_bar)
+        
+        # === 안정적인 코드로 복원 1 ===
+        fire_bg, fire_fg = status_colors("화재")
+        warn_bg, warn_fg = status_colors("주의")
+        normal_bg, nor_fg = status_colors("정상")
+        self.pill_fire = CountPill("화재", fire_bg, fire_fg)
+        self.pill_warn = CountPill("주의", warn_bg, warn_fg)
+        self.pill_normal = CountPill("정상", normal_bg, nor_fg)
+        counts_bar = QHBoxLayout(); counts_bar.setSpacing(8)
+        counts_bar.addWidget(self.pill_fire); counts_bar.addWidget(self.pill_warn); counts_bar.addWidget(self.pill_normal)
+        counts_bar.addStretch(1); rlay.addLayout(counts_bar)
+
         self.cards = [SensorCard(f"Sensor {i}") for i in range(1, self.NUM_SENSORS + 1)]
-        card_layout = QHBoxLayout(); [card_layout.addWidget(self.cards[0]), card_layout.addStretch(1)] if self.cards else None; rlay.addLayout(card_layout)
-        top = QHBoxLayout(); self.toggle_numbers_btn = QPushButton("숫자 표시 토글"); self.toggle_numbers_btn.clicked.connect(self._toggle_numbers); top.addStretch(1); top.addWidget(self.toggle_numbers_btn); rlay.addLayout(top)
-        self.heatmap = Heatmap(8); rlay.addWidget(self.heatmap, 1); splitter.addWidget(right); splitter.setStretchFactor(0,1); splitter.setStretchFactor(1,1); self._refresh_counts()
+        card_layout = QHBoxLayout()
+        # === 안정적인 코드로 복원 2 ===
+        if self.cards:
+            card_layout.addWidget(self.cards[0])
+            card_layout.addStretch(1)
+        rlay.addLayout(card_layout)
+        
+        top = QHBoxLayout(); self.toggle_numbers_btn = QPushButton("숫자 표시 토글") 
+        self.toggle_numbers_btn.clicked.connect(self._toggle_numbers); top.addStretch(1) 
+        top.addWidget(self.toggle_numbers_btn)
+        rlay.addLayout(top)
+        self.heatmap = Heatmap(8)
+        rlay.addWidget(self.heatmap, 1)
+        splitter.addWidget(right)
+        splitter.setStretchFactor(0,1) 
+        splitter.setStretchFactor(1,1)
+        self._refresh_counts()
 
     def _toggle_numbers(self):
         self.heatmap.show_numbers = not self.heatmap.show_numbers
 
     def update_from_detector(self, payload: dict):
+        print("\n\n<<<<<<<<<< DASHBOARD UPDATE 함수가 호출되었습니다! >>>>>>>>>>\n\n")
         data_content = payload.get('data', {})
         sid = data_content.get("sensor_id") or data_content.get("sid") or 1
         if sid in self.sensors:
@@ -231,7 +220,7 @@ class Dashboard(QMainWindow):
             h, w = int(grid_value.get("h", 0)), int(grid_value.get("w", 0))
             vals = grid_value.get("values", [])
             print(f"    - h={h}, w={w}, values 리스트 길이={len(vals)}")
-            if vals and len(vals) >= h * w:
+            if vals and len(vals) >= h * w and h > 0 and w > 0:
                 mat = [vals[i * w:(i + 1) * w] for i in range(h)]
                 print("    - 'mat' 매트릭스 생성 성공!")
             else:
@@ -242,41 +231,26 @@ class Dashboard(QMainWindow):
         print("--- 히트맵 데이터 분석 종료 ---\n")
         if mat: self.heatmap.render(mat)
 
-    # ==================== 수정된 부분 ====================
     def _refresh_counts(self):
-        # 1. 카운트할 변수를 0으로 초기화합니다.
-        fire = 0
-        warn = 0
-        normal = 0
-        # 2. 모든 센서를 하나씩 확인하면서 상태를 셉니다.
+        fire = 0; warn = 0; normal = 0
         for s in self.sensors.values():
             st = (s.status or "").lower()
-            if st in ("화재", "fire"):
-                fire += 1
-            elif st in ("주의", "warn", "warning"):
-                warn += 1
-            else:
-                normal += 1
-        # 3. 계산된 숫자로 화면의 배지를 업데이트합니다.
-        self.pill_fire.set_count(fire)
-        self.pill_warn.set_count(warn)
-        self.pill_normal.set_count(normal)
-    # =====================================================
+            if st in ("화재", "fire"): fire += 1
+            elif st in ("주의", "warn", "warning"): warn += 1
+            else: normal += 1
+        self.pill_fire.set_count(fire); self.pill_warn.set_count(warn); self.pill_normal.set_count(normal)
 
 class OutputModule(QWidget):
     def __init__(self, data_signal_obj, available_rect):
         super().__init__()
         self.win = Dashboard("floorplan.png")
         data_signal_obj.update_data_signal.connect(self.update_from_detector)
-    def show(self):
-        self.win.show()
+    def show(self): self.win.show()
     def update_connection_status(self, connected, port, error_msg=""):
         text = f"연결됨: {port}" if connected else (f"연결 실패: {error_msg}" if error_msg else "연결 안됨")
         status_bar = getattr(self.win, "statusBar", None)
-        if status_bar:
-            status_bar().showMessage(text)
-        else:
-            self.win.setWindowTitle(f"화재 감지 대시보드 - {text}")
+        if status_bar: status_bar().showMessage(text)
+        else: self.win.setWindowTitle(f"화재 감지 대시보드 - {text}")
     def update_from_detector(self, payload: dict):
         print(f"[GUI DEBUG] 수신된 전체 데이터 (요약): {str(payload)[:300]}...")
         self.win.update_from_detector(payload)
