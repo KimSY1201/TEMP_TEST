@@ -14,5 +14,5 @@ temp_app2/
 prac/
 test/
 test2/
-*/_data
-*/_model
+# */_data
+# */_model

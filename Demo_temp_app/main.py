@@ -13,7 +13,7 @@ from signals import DataSignal
 # ==========================
 # 자동 연결 설정 (TCP 전용)
 # ==========================
-AUTO_CONNECT = False
+AUTO_CONNECT = True
 DEFAULT_PORT = 8081  # TCP 통신을 위한 기본 포트 번호
 DEFAULT_BAUDRATE = 57600 # TCP에서는 사용되지 않음
 

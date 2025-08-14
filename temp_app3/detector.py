@@ -107,15 +107,17 @@ class DetectionModule(threading.Thread):
         # 모델 로드 시도
         current_file_path = os.path.abspath(__file__)
         current_dir = os.path.dirname(current_file_path)
-        self.model = {}
-        self.model_path = {'rfm':f'{current_dir}/_model/smv_rfm_model.joblib', 'lgbm': ''}
-        self.load_model()
-        self.encoder = joblib.load(f'{current_dir}/_model/smv_label_en.joblib')
-        self.scaler = joblib.load(f'{current_dir}/_model/smv_mmx_sc.joblib')
+        # self.model = {}
+        # self.model_path = {'rfm':f'{current_dir}/_model/smv_rfm_model.joblib', 'lgbm': ''}
+        # self.load_model()
+        # self.encoder = joblib.load(f'{current_dir}/_model/smv_label_en.joblib')
+        # self.scaler = joblib.load(f'{current_dir}/_model/smv_mmx_sc.joblib')
         
     
     def load_model(self):
         """머신러닝 모델 로드"""
+        self.is_model_loaded = True
+        return
         try:
             for i in self.model_path.keys():
                 if self.model_path[i]:  # 경로가 있는 경우만 로드
@@ -130,6 +132,7 @@ class DetectionModule(threading.Thread):
             self.is_model_loaded = False
     
     def model_predict(self, data_package, model_name):
+        return False
         """머신러닝 모델 예측"""
         temp_dict = {
             'sensor_degree': [data_package['sensor_degree']],
@@ -494,8 +497,8 @@ class DetectionModule(threading.Thread):
                        
                         # 2. 머신러닝 객체 감지
                         object_detection = []
-                        if self.is_model_loaded and 'rfm' in self.model:
-                            object_detection = self.model_predict(data_package, 'rfm')
+                        # if self.is_model_loaded and 'rfm' in self.model:
+                        #     object_detection = self.model_predict(data_package, 'rfm')
                         
                         # 3. 열원 후처리 수행
                         if self.sensor_position == 'corner':
