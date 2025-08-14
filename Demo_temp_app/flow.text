@@ -1,0 +1,27 @@
+(main.py 실행)
+      ↓
+[ApplicationManager 생성]
+      ↓
+[GUI 초기화(OutputModule, DataSignal)]
+      ↓
+(자동 연결 OFF면 대기)
+      │
+      ├─ 사용자가 GUI에서 포트 선택 → on_port_changed()
+      │        ├─ 포트→sensor_id 매핑
+      │        ├─ ReceiverModule 시작(수신 스레드)
+      │        └─ 필요 시 DetectionModule(sensor_id 갱신) 재시작
+      │
+      └─ 자동 연결 ON이면:
+               ├─ 기본 포트로 sensor_id 결정
+               ├─ DetectionModule(sensor_id) 시작
+               └─ ReceiverModule 시작
+      ↓
+[Receiver → detection_queue 로 원본 데이터]
+      ↓
+[DetectionModule: 필터·가중치·보간·상태판정]
+      ↓
+[output_queue 로 GUI 페이로드(status/히트맵 등)]
+      ↓
+[main.py 타이머 check_queues() → DataSignal.emit]
+      ↓
+[GUI OutputModule.update_data_signal 슬롯에서 화면 갱신]
