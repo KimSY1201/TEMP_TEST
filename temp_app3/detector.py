@@ -290,141 +290,114 @@ class DetectionModule(threading.Thread):
             return suspect_fire_coordinate60
 
         
-        
-    
-    
     def detect_fire_and_smoke(self, values):
         """
-        화재 및 연기 감지 로직
-            
-        화재 감지 알고리즘 추가사항
-        - 확산되지 않는 화재 -> 일단 열외
-        - deque 크기 확장. 1초당 3~4개 이므로 10초인 30
-        - 열원 숫자에 따라 감지 레벨 변화
-            - 열원감지에 더 보수적으로. 지속적으로 관측되는 열원에 관해서만 감소/유지/확산 관측
-                - is_heatsource()를 통해서 지속적으로 관측되는 열원의 좌표 얻음 
-            - is_heatsource()를 통해서 확정된 열원들만 열원카운팅함.
-                
-            - 주의 / 경고 / 감지 3단계로 나누기
-            - 열원 발생시 주의
-                - 1deque로 판단 후 안전 처리
-            - 열원 추가 발생시 경고
-                - 2deque로 판단 후 안전 처리
-            - 감지는 실제 화재의 형상으로 열원이 계속해서 증가할 경우.
-            
-        열원의 지속적인 관리 필요 
-        -> safety 변수에 개수 뿐만이 아니라 열원 좌표도 추가하여 관리, dict로?
-            안전 열원이라고 판단시 리스트에서 제외
-            이동하여 새로운 열원이 될 경우 다시 감시 시작.
-            
-        다만 총합 열원 크기가 4개 이상일 경우 화재 경고
-        
+        화재 및 연기 감지 로직 - 통합 버전
+        하나의 deque에서 열원 판별과 화재 판단을 동시에 처리
         """
         fire_detected = False
         smoke_detected = False
-        confirmed_heatsource_coordinate = self.is_heatsource(values)
-        if len(confirmed_heatsource_coordinate) > 0 :
-            print('confirmed_heatsource_coordinate', confirmed_heatsource_coordinate)
-        self.high_temp_counter = len(confirmed_heatsource_coordinate)
         
-        # self.high_temp_counter = np.sum(values > min(self.filter_temp, 33))
-        # print( 'self.last_high_temp_counter', self.last_high_temp_counter)
-        # print( 'self.high_temp_counter', self.high_temp_counter)
+        # 온도 조건에 만족하는 좌표 수집
+        suspect_heatsource_coordinate = np.where((values > min(self.filter_temp, 33)))
         
-        #   열원 존재 조건                  버퍼가 끝났다는 조건                기존 열원에 변화가 있다는 조건
-        if (self.high_temp_counter > 0 and self.buffer_counter == 0) and self.high_temp_counter != self.last_high_temp_counter: 
-            print('열원 개수 변화 감지', self.last_high_temp_counter, self.high_temp_counter)
+        # 현재 프레임의 열원 개수
+        current_temp_counter = len(suspect_heatsource_coordinate[0])
+        
+        # 열원 존재 조건 및 변화 감지
+        if (current_temp_counter > 0 and self.buffer_counter == 0) and current_temp_counter != self.last_high_temp_counter: 
+            print('열원 개수 변화 감지', self.last_high_temp_counter, current_temp_counter)
             self.buffer_counter = self.deque_size
-        
-        # 위의 3개 조건 충족시 버퍼카운터 리필.
             
-            # if self.high_temp_counter != len(self.safety_high_temp_dict):
-                
-            #     # 이전과 현재가 다름으로 조건 들어옴. 추가조건이 필요한가? 열원이 늘었따는 결과만남음.
-            #     # values를 확정열원으로 필터링하여 저장
-            #     self.high_temp_counter_init = np.sum(values[confirmed_heatsource_coordinate] > min(self.filter_temp, 33))
-            #     self.high_temp_counter_init = np.sum(values[confirmed_heatsource_coordinate] > min(self.filter_temp, 33))
-            #     # print(np.where(values > self.filter_temp))
-        
-        ## 버퍼카운터가 남아있다면(위의 3가지 조건 충족 시) 화재감지 버퍼에 저장시작.
-        ## 모든 데이터를 받는 게 아니라 확정열원의 데이터만 받기.
-        if self.buffer_counter > 0 :
-            self.fire_detection_buffer.append(values)
+        if self.buffer_counter > 0:
+            # 통합 버퍼에 현재 프레임의 suspect 좌표와 values 모두 저장
+            self.fire_detection_buffer.append({
+                'values': values,
+                'suspect_coordinates': suspect_heatsource_coordinate
+            })
             self.buffer_counter -= 1
-        
-        # 확정 열원 개수를 받고, 버퍼에 데이터를 수집한 뒤 이 열원이 scd중 어디로 가야할지 판별하는 로직
-        # 화재 감지 버퍼가 가득 차면 평가 시작
-        # if len(self.fire_detection_buffer) == self.deque_size:
-            # 감소 / 유지 / 확산을 판별해야함
-            # 추가되는 열원도 확정열원이어야함.
-            # 유지는 safety로, 확산이면 caution으로 보내야함
             
-            
-        
-        # print('현재/이전', self.high_temp_counter, self.last_high_temp_counter)
+        # 버퍼가 가득 차면 열원 확정 및 화재 판단을 한번에 수행
         if len(self.fire_detection_buffer) == self.deque_size:
             print(f'full buffer, proved {len(self.fire_detection_buffer)} == {self.deque_size}')
-
-            is_fire = self.is_fire(self.fire_detection_buffer, confirmed_heatsource_coordinate)
-            if is_fire :
-                print('caution 진입', self.high_temp_counter)
-                self.safety_status = 'caution'
-            else:
-                print("safety 진입")
-                self.safety_status = 'safety'
-            self.fire_detection_buffer.clear()
-
-        
-        # 주의 단계 2배 데크로 테스트
-        if self.safety_status == 'caution':
-            self.fire_detection_buffer2.append(values)
-            # print(self.fire_detection_buffer2)
-            # 버퍼2가 가득 찬 경우 and 카운터가 바뀌었을때.  => 열원이 늘었을 때만으로 한정.
-        if len(self.fire_detection_buffer2) == self.deque_size*2 and self.safety_status == 'caution': # and self.high_temp_counter > len(self.safety_high_temp_dict):
-            is_fire = self.is_fire(self.fire_detection_buffer2, confirmed_heatsource_coordinate)
-            if is_fire :
-                print("danger 진입")
-                fire_detected = is_fire
-                self.safety_status = 'danger'
-            else:
-                print("safety 진입")
-                self.safety_status = 'safety'
-            self.fire_detection_buffer2.clear()
-        
-
-        return fire_detected, smoke_detected
-    
-    
-    def is_heatsource(self, values):
-        """ 
-        감지한 열이 지속적으로 관측되는 열원인지 아닌지를 판별.
-        deque를 받아서 열이 관측된 셀이 얼마나 지속되는지 확인
-        
-        """
-        
-        #  온도 조건에 만족하는 좌표 수집
-        suspect_heatsource_coordinate = np.where((values > min(self.filter_temp, 33)))
-        # print('suspect_heatsource_coordinate', suspect_heatsource_coordinate)
-        self.suspect_heatsource_buffer.append(suspect_heatsource_coordinate)
-        
-        # print(self.suspect_heatsource_buffer)
-        # 1차 검증 크기만큼 데이터가 수집됬을 경우. 30이면 10초
-        if len(self.suspect_heatsource_buffer) == self.deque_size:
-                
-            flattened_list = [item for t in self.suspect_heatsource_buffer for item in t[0]]
+            
+            # 1단계: 지속적으로 관측되는 열원 확정
+            flattened_list = [item for frame_data in self.fire_detection_buffer 
+                            for item in frame_data['suspect_coordinates'][0]]
             value_counts = pd.Series(flattened_list).value_counts()
-            # print(value_counts)
-            # 모든 튜플에 100%로 등장하는 값을 찾습니다.
-            threshold = len(self.suspect_heatsource_buffer) * 1.0
-            # print('suspect_heatsource_buffer', len(self.suspect_heatsource_buffer))
+            
+            # 모든 프레임에 100% 등장하는 좌표를 확정 열원으로 판정
+            threshold = len(self.fire_detection_buffer) * 1.0
             confirmed_heatsource_coordinate = value_counts[value_counts >= threshold].index.tolist()
             
-            # print(f"전체 튜플 개수: {len(self.suspect_heatsource_buffer)}")
-            # print(f"100% 이상(기준: {threshold}회) 포함된 숫자: {confirmed_heatsource_coordinate}")
-
-            return confirmed_heatsource_coordinate
-        else:
-            return tuple()
+            if len(confirmed_heatsource_coordinate) > 0:
+                print('confirmed_heatsource_coordinate', confirmed_heatsource_coordinate)
+                
+            self.high_temp_counter = len(confirmed_heatsource_coordinate)
+            
+            # 2단계: 확정된 열원을 바탕으로 화재 판단
+            if len(confirmed_heatsource_coordinate) > 0:
+                # 확정 열원이 있을 경우에만 화재 판단 진행
+                buffer_values = [frame_data['values'] for frame_data in self.fire_detection_buffer]
+                is_fire = self.is_fire(buffer_values, confirmed_heatsource_coordinate)
+                
+                if is_fire:
+                    print('caution 진입', self.high_temp_counter)
+                    self.safety_status = 'caution'
+                else:
+                    print("safety 진입")
+                    self.safety_status = 'safety'
+            else:
+                # 확정 열원이 없으면 안전 상태로
+                print("확정 열원 없음 - safety 진입")
+                self.safety_status = 'safety'
+                
+            self.fire_detection_buffer.clear()
+            
+        # 주의 단계에서의 2배 크기 버퍼 처리 (통합 버전)
+        elif self.safety_status == 'caution':
+            # 통합 버퍼에 현재 프레임의 suspect 좌표와 values 모두 저장
+            self.fire_detection_buffer.append({
+                'values': values,
+                'suspect_coordinates': suspect_heatsource_coordinate
+            })
+            
+            # 2배 크기 버퍼가 가득 차면 열원 확정 및 화재 판단 수행
+            if len(self.fire_detection_buffer) == self.deque_size * 2:
+                print(f'full 2x buffer, proved {len(self.fire_detection_buffer)} == {self.deque_size * 2}')
+                
+                # 1단계: 지속적으로 관측되는 열원 확정 (2배 크기 데이터로)
+                flattened_list = [item for frame_data in self.fire_detection_buffer 
+                                for item in frame_data['suspect_coordinates'][0]]
+                value_counts = pd.Series(flattened_list).value_counts()
+                
+                # 2배 크기 버퍼에서의 확정 열원 판정 (임계값도 2배)
+                threshold = len(self.fire_detection_buffer) * 1.0
+                confirmed_heatsource_coordinate_2x = value_counts[value_counts >= threshold].index.tolist()
+                
+                if len(confirmed_heatsource_coordinate_2x) > 0:
+                    print('confirmed_heatsource_coordinate_2x', confirmed_heatsource_coordinate_2x)
+                    
+                # 2단계: 확정된 열원을 바탕으로 화재 판단
+                if len(confirmed_heatsource_coordinate_2x) > 0:
+                    buffer_values = [frame_data['values'] for frame_data in self.fire_detection_buffer]
+                    is_fire = self.is_fire(buffer_values, confirmed_heatsource_coordinate_2x)
+                    
+                    if is_fire:
+                        print("danger 진입")
+                        fire_detected = is_fire
+                        self.safety_status = 'danger'
+                    else:
+                        print("safety 진입")
+                        self.safety_status = 'safety'
+                else:
+                    # 확정 열원이 없으면 안전 상태로
+                    print("확정 열원 없음 - safety 진입")
+                    self.safety_status = 'safety'
+                    
+                self.fire_detection_buffer.clear()
+                
+        return fire_detected, smoke_detected
         
         
         
