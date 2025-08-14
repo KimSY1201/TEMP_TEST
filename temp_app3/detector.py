@@ -497,8 +497,8 @@ class DetectionModule(threading.Thread):
                        
                         # 2. 머신러닝 객체 감지
                         object_detection = []
-                        if self.is_model_loaded and 'rfm' in self.model:
-                            object_detection = self.model_predict(data_package, 'rfm')
+                        # if self.is_model_loaded and 'rfm' in self.model:
+                        #     object_detection = self.model_predict(data_package, 'rfm')
                         
                         # 3. 열원 후처리 수행
                         if self.sensor_position == 'corner':
